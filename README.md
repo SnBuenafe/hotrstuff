@@ -1,13 +1,4 @@
----
-title: "Wrangling ESM data"
-author: "Tin Buenafe"
-date: "2024-05-09"
-output: 
-  html_document:
-    keep_md: true   
----
-
-
+# "Wrangling ESM data"
 
 This vignette shows how you can download, wrangle, and process ESM data to calculate climate metrics. The idea is that the functions are independent of each other and can still perform their purpose without having to follow the entire workflow detailed below, from start to finish.
 
