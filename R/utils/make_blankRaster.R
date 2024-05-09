@@ -2,6 +2,8 @@
 # Written by David Schoeman and Tin Buenafe
   # Last modified: March 2024
 
+pacman::p_load(terra)
+
 make_blankRaster <- function(blankrast_dir, # directory to save the blank raster
                              cell_res # resolution of the cell
 ) {
