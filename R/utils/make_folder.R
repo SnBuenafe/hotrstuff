@@ -4,5 +4,5 @@
 
 make_folder <- function(folder) {
   if(!isTRUE(file.info(folder)$isdir)) dir.create(folder, recursive=TRUE)
-  return(folder)
+  #return(folder)
 }
