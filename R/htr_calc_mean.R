@@ -24,7 +24,7 @@ htr_calc_mean <- function(indir, # where inputs are
 
   esms <- dir(indir, pattern = scenario, full.names = TRUE)
   future::plan(future::multisession, workers = w)
-  future::future_walk(esms, get_mean)
+  furrr::future_walk(esms, get_mean)
   future::plan(future::sequential)
 }
 

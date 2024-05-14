@@ -34,7 +34,7 @@ htr_mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
   nlon <- length(lon)
   lat <- terra::yFromRow(x, 1:nrow(x)) # Lats from raster
   nlat <- length(lat)
-  time <- time_length(interval(lubridate::ymd_hms("1850-01-01-00:00:00"), "1850-01-01"), unit = "day")
+  time <- lubridate::time_length(lubridate::interval(lubridate::ymd_hms("1850-01-01-00:00:00"), "1850-01-01"), unit = "day")
   nt <- length(time)
   tunits <- "days since 1850-01-011 00:00:00.0 -0:00"
 
@@ -91,10 +91,12 @@ htr_make_folder <- function(folder) {
 htr_make_blankRaster <- function(blankrast_dir, # directory to save the blank raster
                              cell_res # resolution of the cell
 ) {
+
   base_rast <- paste0(blankrast_dir, "/base_rast.nc")
-  r <- rast(resolution = cell_res)
+  r <- terra::rast(resolution = cell_res)
   r[] <- 1
-  mask2netCDF4(r,
+
+  htr_mask2netCDF4(r,
     pth = blankrast_dir,
     ncName = basename(base_rast),
     dname = "dummy",
@@ -126,9 +128,12 @@ htr_make_blankRaster <- function(blankrast_dir, # directory to save the blank ra
 #'
 #' @examples
 htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
-  bits <- get_CMIP6_bits(nc_file)
-  y1 <- year(bits$Year_start)
-  y2 <- year(bits$Year_end)
+
+  bits <- htr_get_CMIP6_bits(nc_file)
+
+  y1 <- lubridate::year(bits$Year_start)
+  y2 <- lubridate::year(bits$Year_end)
+
   if ((y1 < yr1 | y2 > yr2) || isFALSE(overwrite)) {
     new_name <- nc_file %>%
       stringr::str_split(paste0("_", as.character(y1))) %>%
@@ -166,7 +171,7 @@ htr_get_meta <- function(x,
                      string # refers to the aspects extracted per climate model
 ) {
   y <- dir(x) %>%
-    purrr::map(get_CMIP6_bits) %>%
+    purrr::map(htr_get_CMIP6_bits) %>%
     purrr::map(`[`, string) %>%
     purrr::map(dplyr::bind_cols) %>%
     dplyr::bind_rows() %>%
@@ -192,8 +197,10 @@ htr_get_meta <- function(x,
 #'
 #' @examples
 htr_get_CMIP6_bits <- function(file_name) {
+
   bits <- stringr::str_split(basename(file_name), "_") %>%
     unlist()
+
   date_start_stop <- bits[7] %>%
     stringr::str_split("[.]") %>%
     purrr::map(1) %>%
@@ -206,7 +213,9 @@ htr_get_CMIP6_bits <- function(file_name) {
   if (stringr::str_detect(file_name, "_.year_")) {
     date_start_stop <- paste0(date_start_stop, c("0101", "1231"))
   } # Fix dates for annual data
+
   date_start_stop <- as.Date(date_start_stop, format = "%Y%m%d")
+
   output <- list(
     Variable = bits[1],
     Frequency = bits[2],
@@ -218,5 +227,5 @@ htr_get_CMIP6_bits <- function(file_name) {
     Year_end = date_start_stop[2]
   )
   return(output)
-  # e.g., map_df(dir(folder), get_CMIP6_bits)
+  # e.g., map_df(dir(folder), htr_get_CMIP6_bits)
 }

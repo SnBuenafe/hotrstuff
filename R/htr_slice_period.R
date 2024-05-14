@@ -1,7 +1,5 @@
 #' Slice Period
 #'
-#' pacman::p_load(furrr, tidyverse, parallel)
-#'
 #' @author Dave Schoeman and Tin Buenafe
 #'
 #' @param indir
@@ -16,7 +14,7 @@
 #' @export
 #'
 #' @examples
-httr_slice_period <- function(indir, # where the merged files are
+htr_slice_period <- function(indir, # where the merged files are
                               outdir, # where the trimmed files will be saved
                               frq, # frequency
                               scenario, # historical or ssp
@@ -31,8 +29,9 @@ httr_slice_period <- function(indir, # where the merged files are
   files <- files[stringr::str_detect(files, scenario)]
 
   trim_timeframe <- function(f) {
-    s <- get_CMIP6_bits(f)$Scenario
-    m <- get_CMIP6_bits(f)$Model
+
+    s <- htr_get_CMIP6_bits(f)$Scenario
+    m <- htr_get_CMIP6_bits(f)$Model
 
     print(paste0(m, "_", s))
 
@@ -52,7 +51,7 @@ httr_slice_period <- function(indir, # where the merged files are
   }
 
   future::plan(future::multisession, workers = w)
-  future::future_walk(files, trim_timeframe)
+  furrr::future_walk(files, trim_timeframe)
   future::plan(future::sequential)
 }
 
@@ -83,14 +82,16 @@ trim_period <- function(f, # file
                         year_start,
                         year_end,
                         overwrite) {
-  dt1 <- get_CMIP6_bits(f)$Year_start %>%
+
+  dt1 <- htr_get_CMIP6_bits(f)$Year_start %>%
     as.Date()
 
-  dt2 <- get_CMIP6_bits(f)$Year_end %>%
+  dt2 <- htr_get_CMIP6_bits(f)$Year_end %>%
     as.Date()
 
   if (dt1 <= as.Date(paste0(year_start, "-01-01")) | dt2 >= as.Date(paste0(year_end, "-12-31"))) {
-    get_Years(f, year_start, year_end, indir, outdir, overwrite) # replacing files in merged folder with trimmed files
+
+    htr_get_Years(f, year_start, year_end, indir, outdir, overwrite) # replacing files in merged folder with trimmed files
 
     if (isTRUE(overwrite)) {
       terminal_code <- paste0("rm ", indir, "/", f)

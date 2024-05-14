@@ -20,47 +20,49 @@ htr_regrid_esm <- function(indir, # input directory
                            cell_res = 0.25, # resolution of blank raster
                            layer # which layer is being regridded (anomalies, annual, etc.?)
 ) {
+
   w <- parallel::detectCores() - 2
 
-  base_rast <- make_blankRaster(
+  base_rast <- htr_make_blankRaster(
     blankrast_dir,
     cell_res
   )
 
   # Get files and remap
   netCDFs <- dir(indir, full.names = TRUE)
-  future::plan(future::multisession, workers = w)
-  future::future_walk(netCDFs, remap_netCDF, base_rast)
-  future::plan(future::sequential)
-  system(paste0("rm -r ", blankrast_dir))
-}
 
+  ##############
 
-#' Remap Netcdf
-#'
-#' @param anom_file
-#'
-#' @return
-#'
-#' @noRd
-remap_netCDF <- function(anom_file, base_rast) {
-  new_name <- basename(anom_file) %>%
-    stringr::str_replace(layer, paste0("Regridded", stringr::str_to_sentence(layer)))
+  remap_netCDF <- function(anom_file, base_rast, layer) {
 
-  # Standard, terra-compatible cell-res degree grid
-  bits <- get_CMIP6_bits(basename(anom_file))
+    new_name <- basename(anom_file) %>%
+      stringr::str_replace(layer, paste0("Regridded", stringr::str_to_sentence(layer)))
 
-  print(paste(bits$Model, bits$Scenario))
+    # Standard, terra-compatible cell-res degree grid
+    bits <- htr_get_CMIP6_bits(basename(anom_file))
 
-  out_file <- anom_file %>%
-    stringr::str_replace(indir, outdir) %>%
-    stringr::str_replace(basename(anom_file), new_name)
+    print(paste(bits$Model, bits$Scenario))
 
-  if (bits$Variable == "pr") { # For precipitation, use conservative remapping
-    cdo_code <- paste0("cdo -s -L -remapcon,", base_rast, " ", anom_file, " ", out_file)
-    system(cdo_code)
-  } else { # For everything else, use bilinear interpolation, although Bio-ORACLE uses remapdis, so consider changing to that
-    cdo_code <- paste0("cdo -s -L -remapbil,", base_rast, " ", anom_file, " ", out_file)
-    system(cdo_code)
+    out_file <- anom_file %>%
+      stringr::str_replace(indir, outdir) %>%
+      stringr::str_replace(basename(anom_file), new_name)
+
+    if (bits$Variable == "pr") { # For precipitation, use conservative remapping
+      cdo_code <- paste0("cdo -s -L -remapcon,", base_rast, " ", anom_file, " ", out_file)
+      system(cdo_code)
+    } else { # For everything else, use bilinear interpolation, although Bio-ORACLE uses remapdis, so consider changing to that
+      cdo_code <- paste0("cdo -s -L -remapbil,", base_rast, " ", anom_file, " ", out_file)
+      system(cdo_code)
+    }
   }
+
+  ##############
+
+  future::plan(future::multisession, workers = w)
+  furrr::future_walk(netCDFs, remap_netCDF, base_rast, layer)
+  future::plan(future::sequential)
+
+  system(paste0("rm -r ", blankrast_dir))
+
 }
+

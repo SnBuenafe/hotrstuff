@@ -30,7 +30,7 @@ htr_create_ensemble <- function(indir,
 
   out_name <- files[1] %>%
     stringr::str_replace(indir, outdir) %>%
-    stringr::str_replace(get_CMIP6_bits(files[1])$Model, "ensemble")
+    stringr::str_replace(htr_get_CMIP6_bits(files[1])$Model, "ensemble")
 
   if (mean == TRUE) {
     cdo_code <- paste0("cdo -L -z zip -ensmean ", paste0(files, collapse = " "), " ", out_name)

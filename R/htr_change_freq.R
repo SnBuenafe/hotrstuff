@@ -16,12 +16,13 @@ htr_change_freq <- function(freq,
   w <- parallel::detectCores() - 2
 
   esms <- dir(indir, pattern = "*.nc", full.names = TRUE)
+
   future::plan(future::multisession, workers = w)
 
   if (stringr::str_to_lower(freq) == "yearly") {
-    future::future_walk(esms, change_yearly)
+    furrr::future_walk(esms, change_yearly, outdir) # JDE
   } else if (stringr::str_to_lower(freq) == "monthly") {
-    future::future_walk(esms, change_monthly)
+    furrr::future_walk(esms, change_monthly, outdir) # JDE
   }
 
   future::plan(future::sequential)
@@ -37,7 +38,7 @@ htr_change_freq <- function(freq,
 #' @return
 #'
 #' @noRd
-change_yearly <- function(f) {
+change_yearly <- function(f, outdir) {
   out_file <- f %>%
     basename() %>%
     stringr::str_split("_merged_") %>%
@@ -54,7 +55,7 @@ change_yearly <- function(f) {
 #' @param f
 #'
 #' @noRd
-change_monthly <- function(f) {
+change_monthly <- function(f, outdir) {
   out_file <- f %>%
     basename() %>%
     stringr::str_split("_merged_") %>%
