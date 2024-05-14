@@ -21,12 +21,12 @@ htr_calc_mean <- function(indir, # where inputs are
                            year_end # end year for calculating mean of time period
 ) {
 
-  w <- detectCores()-2
+  w <- parallel::detectCores()-2
 
   esms <- dir(indir, pattern = scenario, full.names = TRUE)
-  plan(multisession, workers = w)
-  future_walk(esms, get_mean)
-  plan(sequential)
+  future::plan(future::multisession, workers = w)
+  future::future_walk(esms, get_mean)
+  future::plan(future::sequential)
 
 }
 
@@ -36,11 +36,14 @@ htr_calc_mean <- function(indir, # where inputs are
 #' @param f
 #'
 #' @return
+#'
+#' @noRd
+#'
 get_mean <- function(f) {
   out_file <- f %>%
     basename() %>%
-    str_split("_merged_") %>%
-    map(~paste0(.x[1], "_mean_", year_start, "0101-", year_end, "1231.nc")) %>%
+    stringr::str_split("_merged_") %>%
+    purrr::map(~paste0(.x[1], "_mean_", year_start, "0101-", year_end, "1231.nc")) %>%
     paste0(outdir, "/", .)
   cdo_code <- paste0("cdo -L -timmean -selyear,", year_start, "/", year_end, " ", f, " ", out_file)
   system(cdo_code)

@@ -16,13 +16,13 @@ htr_download_ESM <- function(indir, # where wget files are located
 ) {
 
   pth <- getwd()
-  w <- detectCores()-2
+  w <- parallel::detectCores()-2
 
   files <- dir(indir, pattern = "wget", full.names = TRUE)
 
-  plan(multisession, workers = w)
-  future_walk(files, wget_files)
-  plan(sequential)
+  future::plan(future::multisession, workers = w)
+  future::future_walk(files, wget_files)
+  future::plan(future::sequential)
 
 }
 
@@ -31,9 +31,9 @@ htr_download_ESM <- function(indir, # where wget files are located
 #' @param script
 #'
 #' @return
-#' @export
 #'
-#' @examples
+#' @noRd
+#'
 wget_files <- function(script) {
   setwd(outdir)
   system(paste0("bash ", script, " -s")) # Change the path to where you want the data stored, then run wget from there

@@ -1,9 +1,28 @@
 Package: hotrstuff
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+Authors@R: c(
+    person(
+      given = "Kristine (Tin) C.",
+      family = "Buenafe",
+      role = c("aut", "cre"),
+      email = "tinbuenafe@gmail.com",
+      comment = c(ORCID = "0000-0002-1643-5557")
+      ),
+    person(
+      given = "David",
+      family = "Schoeman",
+      role = "aut",
+      email = "david.schoeman@gmail.com",
+      comment = c(ORCID = "0000-0003-1258-0885")
+      ),
+    person(
+      given = "Jason D.",
+      family = "Everett",
+      role = "aut",
+      email = "JaseEverett@gmail.com",
+      comment = c(ORCID = "0000-0002-6681-8054")
+      ))
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
 Encoding: UTF-8
@@ -17,10 +36,11 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 Imports: 
     dplyr,
-    furrr,
+    future,
     lubridate,
     magrittr,
     ncdf4,
     parallel,
+    purrr,
     stringr,
     terra

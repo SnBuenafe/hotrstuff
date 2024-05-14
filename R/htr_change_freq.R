@@ -14,21 +14,21 @@ htr_change_freq <- function(freq,
                             indir,
                             outdir) {
 
-  w <- detectCores()-2
+  w <- parallel::detectCores()-2
 
   esms <- dir(indir, pattern = "*.nc", full.names = TRUE)
-  plan(multisession, workers = w)
+  future::plan(future::multisession, workers = w)
 
   if (stringr::str_to_lower(freq) == "yearly") {
 
-    future_walk(esms, change_yearly)
+    future::future_walk(esms, change_yearly)
 
   } else if (stringr::str_to_lower(freq) == "monthly") {
 
-    future_walk(esms, change_monthly)
+    future::future_walk(esms, change_monthly)
   }
 
-  plan(sequential)
+  future::plan(future::sequential)
 
 }
 
@@ -40,12 +40,14 @@ htr_change_freq <- function(freq,
 #' @param f
 #'
 #' @return
+#'
+#' @noRd
 change_yearly <- function(f) {
 
   out_file <- f %>%
     basename() %>%
-    str_split("_merged_") %>%
-    map(~paste0(.x[1], "_annual_", .x[2])) %>%
+    stringr::str_split("_merged_") %>%
+    purrr::map(~paste0(.x[1], "_annual_", .x[2])) %>%
     paste0(outdir, "/", .)
 
   cdo_code <- paste0("cdo -yearmean", " ", f, " ", out_file)
@@ -58,13 +60,13 @@ change_yearly <- function(f) {
 #'
 #' @param f
 #'
-#' @return
+#' @noRd
 change_monthly <- function(f) {
 
   out_file <- f %>%
     basename() %>%
-    str_split("_merged_") %>%
-    map(~paste0(.x[1], "_monthly_", .x[2])) %>%
+    stringr::str_split("_merged_") %>%
+    purrr::map(~paste0(.x[1], "_monthly_", .x[2])) %>%
     paste0(outdir, "/", .)
 
   cdo_code <- paste0("cdo -monmean", " ", f, " ", out_file)

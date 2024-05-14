@@ -23,16 +23,15 @@ htr_create_ensemble <- function(indir,
                             mean = TRUE # if false, use median
 ) {
 
-  w <- detectCores() - 2
-
+  w <- parallel::detectCores() - 2
 
   files <- dir(indir, full.names = TRUE) %>%
-    str_subset(paste0("(?=.*", variable, "_", ")(?=.*", frequency, "_", ")(?=.*", scenario, "_", ")")) %>%
-    str_subset(paste(model_list, collapse = "|"))
+    stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", frequency, "_", ")(?=.*", scenario, "_", ")")) %>%
+    stringr::str_subset(paste(model_list, collapse = "|"))
 
   out_name <- files[1] %>%
-    str_replace(indir, outdir) %>%
-    str_replace(get_CMIP6_bits(files[1])$Model, "ensemble")
+    stringr::str_replace(indir, outdir) %>%
+    stringr::str_replace(get_CMIP6_bits(files[1])$Model, "ensemble")
 
   if(mean == TRUE) {
     cdo_code <- paste0("cdo -L -z zip -ensmean ", paste0(files, collapse = " "), " ", out_name)

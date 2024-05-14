@@ -25,11 +25,11 @@ httr_slice_period <- function(indir, # where the merged files are
                          overwrite # TRUE or FALSE
 ) {
 
-  w <- detectCores()-2
+  w <- parallel::detectCores()-2
 
   files <- dir(indir, pattern = paste0("_", frq, "_"))
 
-  files <- files[str_detect(files, scenario)]
+  files <- files[stringr::str_detect(files, scenario)]
 
   trim_timeframe <- function(f) {
 
@@ -38,7 +38,7 @@ httr_slice_period <- function(indir, # where the merged files are
 
     print(paste0(m, "_", s))
 
-    if(str_detect(s, scenario)) {
+    if(stringr::str_detect(s, scenario)) {
 
       trim_period(f,
                   s,
@@ -54,9 +54,9 @@ httr_slice_period <- function(indir, # where the merged files are
 
   }
 
-  plan(multisession, workers = w)
-  future_walk(files, trim_timeframe)
-  plan(sequential)
+  future::plan(future::multisession, workers = w)
+  future::future_walk(files, trim_timeframe)
+  future::plan(future::sequential)
 
 }
 
@@ -78,6 +78,8 @@ httr_slice_period <- function(indir, # where the merged files are
 #' @param overwrite
 #'
 #' @return
+#'
+#' @noRd
 trim_period <- function(f, # file
                         scenario, # historical or ssp
                         indir,
