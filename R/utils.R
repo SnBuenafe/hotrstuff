@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
+htr_mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
                          ncName = "mask.nc",
                          dname = "tos",
                          dlname = "tos") {
@@ -71,7 +71,7 @@ mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
 #' @export
 #'
 #' @examples
-make_folder <- function(folder) {
+htr_make_folder <- function(folder) {
   if (!isTRUE(file.info(folder)$isdir)) dir.create(folder, recursive = TRUE)
 }
 
@@ -88,7 +88,7 @@ make_folder <- function(folder) {
 #' @export
 #'
 #' @examples
-make_blankRaster <- function(blankrast_dir, # directory to save the blank raster
+htr_make_blankRaster <- function(blankrast_dir, # directory to save the blank raster
                              cell_res # resolution of the cell
 ) {
   base_rast <- paste0(blankrast_dir, "/base_rast.nc")
@@ -125,7 +125,7 @@ make_blankRaster <- function(blankrast_dir, # directory to save the blank raster
 #' @export
 #'
 #' @examples
-get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
+htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
   bits <- get_CMIP6_bits(nc_file)
   y1 <- year(bits$Year_start)
   y2 <- year(bits$Year_end)
@@ -162,7 +162,7 @@ get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
 #' @export
 #'
 #' @examples
-get_meta <- function(x,
+htr_get_meta <- function(x,
                      string # refers to the aspects extracted per climate model
 ) {
   y <- dir(x) %>%
@@ -191,7 +191,7 @@ get_meta <- function(x,
 #' @export
 #'
 #' @examples
-get_CMIP6_bits <- function(file_name) {
+htr_get_CMIP6_bits <- function(file_name) {
   bits <- stringr::str_split(basename(file_name), "_") %>%
     unlist()
   date_start_stop <- bits[7] %>%
