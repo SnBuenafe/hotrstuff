@@ -7,6 +7,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
 pacman::p_load(here, purrr)
 
 # Call utils
@@ -39,13 +42,13 @@ To download ESMs, you'd still have to download the `wget` scripts from your chos
 If you want to follow along, use the wget scripts that are in the `data/raw/wget` folder. But, you can use other `wget` scripts; just make sure to change the arguments.
 
 Then, run the `download_ESM` function to run all the `wget` scripts found in that folder.
-```{r download}
-# source(here("R", "functions", "download_ESM.R"))
-# 
-# make_folder(here("data", "raw", "tos")) # make folder
-# download_ESM(indir = here("data", "raw", "wget"), # input directory
-#              outdir = here("data", "raw", "tos") # output directory
-#              )
+```{r download, eval=FALSE}
+source(here("R", "functions", "download_ESM.R"))
+
+make_folder(here("data", "raw", "tos")) # make folder
+download_ESM(indir = here("data", "raw", "wget"), # input directory
+             outdir = here("data", "raw", "tos") # output directory
+             )
 ```
 
 Un-comment the code above if you want to download new data.
