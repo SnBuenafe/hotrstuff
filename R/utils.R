@@ -1,5 +1,3 @@
-
-
 #' Function to convert a raster mask to a netCDF
 #'
 #'
@@ -21,8 +19,7 @@
 mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
                          ncName = "mask.nc",
                          dname = "tos",
-                         dlname = "tos")	{
-
+                         dlname = "tos") {
   nc_name <- paste0(pth, "/", ncName) # Input netCDF
 
   # Temporary files
@@ -42,14 +39,14 @@ mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
   tunits <- "days since 1850-01-011 00:00:00.0 -0:00"
 
   # Use this to build a multi-layer array
-  tmp_array <- array(r1out, dim=c(nlon, nlat, nt)) # Write as an array
+  tmp_array <- array(r1out, dim = c(nlon, nlat, nt)) # Write as an array
 
   # Set neCDF variables and dimensions
-  londim <- ncdf4::ncdim_def("lon","degrees_east", as.double(lon), calendar = "365_day", longname = "longitude")
-  latdim <- ncdf4::ncdim_def("lat","degrees_north", as.double(lat), calendar = "365_day", longname = "latitude")
+  londim <- ncdf4::ncdim_def("lon", "degrees_east", as.double(lon), calendar = "365_day", longname = "longitude")
+  latdim <- ncdf4::ncdim_def("lat", "degrees_north", as.double(lat), calendar = "365_day", longname = "latitude")
   timedim <- ncdf4::ncdim_def("time", tunits, as.double(time), calendar = "365_day", longname = "time")
   fillvalue <- missvalue <- 1.00000002004088e+20 # Na values
-  tmp_def <- ncdf4::ncvar_def(dname,"deg_C", list(londim, latdim, timedim), missvalue, dlname, prec = "double")
+  tmp_def <- ncdf4::ncvar_def(dname, "deg_C", list(londim, latdim, timedim), missvalue, dlname, prec = "double")
 
   # Create netCDF file and assign arrays
   ncout <- ncdf4::nc_create(nc1, list(tmp_def)) # Don't force it to be netCDF4, or CDO will fail
@@ -75,8 +72,7 @@ mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
 #'
 #' @examples
 make_folder <- function(folder) {
-  if(!isTRUE(file.info(folder)$isdir)) dir.create(folder, recursive=TRUE)
-
+  if (!isTRUE(file.info(folder)$isdir)) dir.create(folder, recursive = TRUE)
 }
 
 
@@ -95,14 +91,15 @@ make_folder <- function(folder) {
 make_blankRaster <- function(blankrast_dir, # directory to save the blank raster
                              cell_res # resolution of the cell
 ) {
-
   base_rast <- paste0(blankrast_dir, "/base_rast.nc")
   r <- rast(resolution = cell_res)
   r[] <- 1
-  mask2netCDF4(r, pth = blankrast_dir,
-               ncName = basename(base_rast),
-               dname = "dummy",
-               dlname = "dummy") # changes the base_rast to netcdf4
+  mask2netCDF4(r,
+    pth = blankrast_dir,
+    ncName = basename(base_rast),
+    dname = "dummy",
+    dlname = "dummy"
+  ) # changes the base_rast to netcdf4
 
   return(base_rast)
 }
@@ -132,7 +129,7 @@ get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
   bits <- get_CMIP6_bits(nc_file)
   y1 <- year(bits$Year_start)
   y2 <- year(bits$Year_end)
-  if((y1 < yr1 | y2 > yr2) || isFALSE(overwrite)) {
+  if ((y1 < yr1 | y2 > yr2) || isFALSE(overwrite)) {
     new_name <- nc_file %>%
       stringr::str_split(paste0("_", as.character(y1))) %>%
       purrr::map(1) %>%
@@ -168,7 +165,6 @@ get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
 get_meta <- function(x,
                      string # refers to the aspects extracted per climate model
 ) {
-
   y <- dir(x) %>%
     purrr::map(get_CMIP6_bits) %>%
     purrr::map(`[`, string) %>%
@@ -179,7 +175,6 @@ get_meta <- function(x,
     unname()
 
   return(y)
-
 }
 
 
@@ -205,21 +200,23 @@ get_CMIP6_bits <- function(file_name) {
     unlist() %>%
     stringr::str_split("-") %>%
     unlist()
-  if(stringr::str_detect(file_name, "_.mon_")) {
+  if (stringr::str_detect(file_name, "_.mon_")) {
     date_start_stop <- paste0(date_start_stop, c("01", "31"))
   } # Fix dates for monthly data
-  if(stringr::str_detect(file_name, "_.year_")) {
+  if (stringr::str_detect(file_name, "_.year_")) {
     date_start_stop <- paste0(date_start_stop, c("0101", "1231"))
   } # Fix dates for annual data
   date_start_stop <- as.Date(date_start_stop, format = "%Y%m%d")
-  output <- list(Variable = bits[1],
-                 Frequency = bits[2],
-                 Model = bits[3],
-                 Scenario = bits[4],
-                 Variant = bits[5],
-                 Grid = bits[6],
-                 Year_start = date_start_stop[1],
-                 Year_end = date_start_stop[2])
+  output <- list(
+    Variable = bits[1],
+    Frequency = bits[2],
+    Model = bits[3],
+    Scenario = bits[4],
+    Variant = bits[5],
+    Grid = bits[6],
+    Year_start = date_start_stop[1],
+    Year_end = date_start_stop[2]
+  )
   return(output)
   # e.g., map_df(dir(folder), get_CMIP6_bits)
 }
