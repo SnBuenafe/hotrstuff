@@ -12,6 +12,10 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 The goal of hotrstuff is to …
 
+## Requirements
+
+hotrstuff requires cdo to be installed
+
 ## Installation
 
 You can install the development version of hotrstuff from

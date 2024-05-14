@@ -57,3 +57,6 @@ rsconnect/
 .Rdata
 .quarto
 inst/doc
+/doc/
+/Meta/
+/data-raw/data

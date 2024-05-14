@@ -22,6 +22,10 @@ knitr::opts_chunk$set(
 
 The goal of hotrstuff is to ...
 
+## Requirements
+
+hotrstuff requires cdo to be installed
+
 ## Installation
 
 You can install the development version of hotrstuff from [GitHub](https://github.com/) with:
