@@ -1,28 +1,52 @@
-# "Wrangling ESM data"
 
-This vignette shows how you can download, wrangle, and process ESM data to calculate climate metrics. The idea is that the functions are independent of each other and can still perform their purpose without having to follow the entire workflow detailed below, from start to finish.
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
-This code works for both monthly (`mon`) and daily (`day`) climate data.
+# hotrstuff
 
-I would recommend creating a `data` folder, with the following basic structure:
+<!-- badges: start -->
+<!-- badges: end -->
 
-- `data/raw/`: raw, untouched data
-  - `data/raw/wget`: downloaded `wget` scripts
-  - `data/raw/tos`: raw ESM data (e.g., tos - sea surface temperature)
-- `data/proc/`: processed ESM data
-  - `data/proc/merged`: merged files per model - 1 model per model/variable/scenario/frequency combination
-  - `data/proc/sliced`: sliced files depending on the required time period
-  - `data/proc/yearly`: yearly data (after converting monthly frequency to yearly frequency)
-  - `data/proc/regridded`: regridded data, standardizing grids of data
-  - `data/proc/ensemble`: ensemble mean/median for each variable/scenario/frequency combination
-  
-We will follow this folder structure throughout the vignette. It will still work with a different folder structure, just make sure you're inputting the right paths.
+The goal of hotrstuff is to …
 
-Vignette is found in `R/analysis/ESM_vignette.Rmd` and will go through the following steps:
-1. Downloading ESM outputs
-2. Merging files
-3. Adjust and reframe time periods
-4. Fix calendar periods (if needed)
-5. Changing frequency of climate data
-6. Regridding
-7. Create ensemble
+## Installation
+
+You can install the development version of hotrstuff from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("SnBuenafe/hotrstuff")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+``` r
+library(hotrstuff)
+## basic example code
+```
+
+What is special about using `README.Rmd` instead of just `README.md`?
+You can include R chunks like so:
+
+``` r
+summary(cars)
+#>      speed           dist       
+#>  Min.   : 4.0   Min.   :  2.00  
+#>  1st Qu.:12.0   1st Qu.: 26.00  
+#>  Median :15.0   Median : 36.00  
+#>  Mean   :15.4   Mean   : 42.98  
+#>  3rd Qu.:19.0   3rd Qu.: 56.00  
+#>  Max.   :25.0   Max.   :120.00
+```
+
+You’ll still need to render `README.Rmd` regularly, to keep `README.md`
+up-to-date. `devtools::build_readme()` is handy for this.
+
+You can also embed plots, for example:
+
+<img src="man/figures/README-pressure-1.png" width="100%" />
+
+In that case, don’t forget to commit and push the resulting figure
+files, so they display on GitHub and CRAN.
