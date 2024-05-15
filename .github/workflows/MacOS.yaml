@@ -38,8 +38,7 @@ jobs:
           use-public-rspm: true
 
       - name: Install system dependencies
-        run: |
-          brew install cdo
+        run: brew install cdo
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
