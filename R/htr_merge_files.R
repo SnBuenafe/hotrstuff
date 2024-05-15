@@ -20,6 +20,8 @@ htr_merge_files <- function(indir, # where nc files are located
                             year_start, # start year of historical file
                             year_end # end year of projection file
 ) {
+  . <- NULL # Stop devtools::check() complaints about NSE
+
   w <- parallel::detectCores() - 2
 
   l <- htr_get_meta(indir, string = c("Variable", "Frequency", "Scenario", "Model", "Variant"))
@@ -32,7 +34,6 @@ htr_merge_files <- function(indir, # where nc files are located
                        m, # model
                        vt # variant
   ) {
-
     files <- dir(indir, full.names = TRUE) %>%
       stringr::str_subset(paste0("(?=.*", v, "_", ")(?=.*", fr, "_", ")(?=.*", m, "_", ")(?=.*", s, "_", ")(?=.*", vt, "_", ")")) # in reg exp ".*" means any string of any length, so this formulation requires the variable, model and scenario to be in THAT order in a string, with each followed by "_", but with no other real constraints
 
@@ -80,7 +81,6 @@ htr_merge_files <- function(indir, # where nc files are located
   ##############
 
   future::plan(future::multisession, workers = w) # to download wget files in parallel
-  furrr::future_pwalk(l, do_merge) #JDE
+  furrr::future_pwalk(l, do_merge) # JDE
   future::plan(future::sequential) # revert back to sequential processing
 }
-

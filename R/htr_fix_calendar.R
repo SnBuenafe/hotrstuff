@@ -10,8 +10,10 @@
 #' @export
 #'
 #' @examples
-htr_fix_calendar <- function(indir # input directory
-) {
+htr_fix_calendar <- function(indir) { # input directory
+
+  . <- NULL # Stop devtools::check() complaints about NSE
+
   w <- parallel::detectCores() - 2
 
   fix_cal <- function(f) {
@@ -39,5 +41,3 @@ htr_fix_calendar <- function(indir # input directory
   furrr::future_walk(netCDFs, fix_cal)
   future::plan(future::sequential)
 }
-
-

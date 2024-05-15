@@ -36,20 +36,20 @@ img_cropped <- hex_crop(
 
 ## CREATE STICKER
 hs <- hexSticker::sticker("data-raw/stripes_cropped.png",
-                          package = "hotrstuff",
-                          p_y = 1,
-                          p_x = 1,
-                          p_color = "black",
-                          p_size = 80,
-                          p_fontface = "bold",
-                          s_x = 1,
-                          s_y = 1,
-                          s_width = 0.835,
-                          s_height = 0.835,
-                          # h_fill = "#9FE2BF",
-                          h_color = "black", # "grey40",
-                          dpi = 1000,
-                          asp = 1,
-                          filename = file.path("data-raw", "logo.png")
-                          # filename = file.path("man", "figures", "logo.png")
+  package = "hotrstuff",
+  p_y = 1,
+  p_x = 1,
+  p_color = "black",
+  p_size = 80,
+  p_fontface = "bold",
+  s_x = 1,
+  s_y = 1,
+  s_width = 0.835,
+  s_height = 0.835,
+  # h_fill = "#9FE2BF",
+  h_color = "black", # "grey40",
+  dpi = 1000,
+  asp = 1,
+  filename = file.path("data-raw", "logo.png")
+  # filename = file.path("man", "figures", "logo.png")
 )

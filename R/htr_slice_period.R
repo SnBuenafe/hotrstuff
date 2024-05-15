@@ -15,12 +15,12 @@
 #'
 #' @examples
 htr_slice_period <- function(indir, # where the merged files are
-                              outdir, # where the trimmed files will be saved
-                              frq, # frequency
-                              scenario, # historical or ssp
-                              year_start,
-                              year_end,
-                              overwrite # TRUE or FALSE
+                             outdir, # where the trimmed files will be saved
+                             frq, # frequency
+                             scenario, # historical or ssp
+                             year_start,
+                             year_end,
+                             overwrite # TRUE or FALSE
 ) {
   w <- parallel::detectCores() - 2
 
@@ -29,7 +29,6 @@ htr_slice_period <- function(indir, # where the merged files are
   files <- files[stringr::str_detect(files, scenario)]
 
   trim_timeframe <- function(f) {
-
     s <- htr_get_CMIP6_bits(f)$Scenario
     m <- htr_get_CMIP6_bits(f)$Model
 
@@ -82,7 +81,6 @@ trim_period <- function(f, # file
                         year_start,
                         year_end,
                         overwrite) {
-
   dt1 <- htr_get_CMIP6_bits(f)$Year_start %>%
     as.Date()
 
@@ -90,7 +88,6 @@ trim_period <- function(f, # file
     as.Date()
 
   if (dt1 <= as.Date(paste0(year_start, "-01-01")) | dt2 >= as.Date(paste0(year_end, "-12-31"))) {
-
     htr_get_Years(f, year_start, year_end, indir, outdir, overwrite) # replacing files in merged folder with trimmed files
 
     if (isTRUE(overwrite)) {

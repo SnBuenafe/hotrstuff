@@ -20,7 +20,6 @@ htr_regrid_esm <- function(indir, # input directory
                            cell_res = 0.25, # resolution of blank raster
                            layer # which layer is being regridded (anomalies, annual, etc.?)
 ) {
-
   w <- parallel::detectCores() - 2
 
   base_rast <- htr_make_blankRaster(
@@ -34,7 +33,6 @@ htr_regrid_esm <- function(indir, # input directory
   ##############
 
   remap_netCDF <- function(anom_file, base_rast, layer) {
-
     new_name <- basename(anom_file) %>%
       stringr::str_replace(layer, paste0("Regridded", stringr::str_to_sentence(layer)))
 
@@ -63,6 +61,4 @@ htr_regrid_esm <- function(indir, # input directory
   future::plan(future::sequential)
 
   system(paste0("rm -r ", blankrast_dir))
-
 }
-

@@ -34,4 +34,3 @@ htr_download_ESM <- function(indir, # where wget files are located
   furrr::future_walk(files, wget_files)
   future::plan(future::sequential)
 }
-

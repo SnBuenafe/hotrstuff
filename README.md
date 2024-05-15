@@ -8,13 +8,43 @@
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/SnBuenafe/hotrstuff/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/R-CMD-check.yaml)
+[![test-coverage](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 
 The goal of hotrstuff is to …
 
 ## Requirements
 
-hotrstuff requires cdo to be installed
+hotrstuff requires cdo to be installed. More about cdo installation can
+be found on the [cdo installer
+website](https://code.mpimet.mpg.de/projects/cdo/wiki#Installation-and-Supported-Platforms)
+
+### Mac
+
+The easiest way to install `cdo` is using Homebrew:
+
+    brew install cdo
+
+More information can be found on the [CDO Mac
+Website](https://code.mpimet.mpg.de/projects/cdo/wiki/MacOS_Platform).
+
+### Windows
+
+Recent versions of Windows (\>=10) included an Ubuntu embedded Linux.
+This environment offers a clean integration with the windows file
+systems and and the opportunity to install CDO via the native package
+manager of Ubuntu:
+
+    sudo apt-get upgrade
+    sudo apt-get install cdo
+
+More information can be found on the [CDO Windows
+Website](https://code.mpimet.mpg.de/projects/cdo/wiki/Win32)
+
+### Unix/Linux
+
+    sudo apt-get upgrade
+    sudo apt-get install cdo
 
 ## Installation
 

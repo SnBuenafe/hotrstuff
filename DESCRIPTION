@@ -37,6 +37,7 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 Imports: 
     dplyr,
+    furrr,
     future,
     lubridate,
     magrittr,
@@ -45,3 +46,5 @@ Imports:
     purrr,
     stringr,
     terra
+URL: https://github.com/SnBuenafe/hotrstuff
+BugReports: https://github.com/SnBuenafe/hotrstuff/issues

@@ -17,9 +17,9 @@
 #'
 #' @examples
 htr_mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
-                         ncName = "mask.nc",
-                         dname = "tos",
-                         dlname = "tos") {
+                             ncName = "mask.nc",
+                             dname = "tos",
+                             dlname = "tos") {
   nc_name <- paste0(pth, "/", ncName) # Input netCDF
 
   # Temporary files
@@ -89,9 +89,8 @@ htr_make_folder <- function(folder) {
 #'
 #' @examples
 htr_make_blankRaster <- function(blankrast_dir, # directory to save the blank raster
-                             cell_res # resolution of the cell
+                                 cell_res # resolution of the cell
 ) {
-
   base_rast <- paste0(blankrast_dir, "/base_rast.nc")
   r <- terra::rast(resolution = cell_res)
   r[] <- 1
@@ -128,6 +127,7 @@ htr_make_blankRaster <- function(blankrast_dir, # directory to save the blank ra
 #'
 #' @examples
 htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
+  . <- NULL # Stop devtools::check() complaints about NSE
 
   bits <- htr_get_CMIP6_bits(nc_file)
 
@@ -168,7 +168,7 @@ htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
 #'
 #' @examples
 htr_get_meta <- function(x,
-                     string # refers to the aspects extracted per climate model
+                         string # refers to the aspects extracted per climate model
 ) {
   y <- dir(x) %>%
     purrr::map(htr_get_CMIP6_bits) %>%
@@ -197,7 +197,6 @@ htr_get_meta <- function(x,
 #'
 #' @examples
 htr_get_CMIP6_bits <- function(file_name) {
-
   bits <- stringr::str_split(basename(file_name), "_") %>%
     unlist()
 
