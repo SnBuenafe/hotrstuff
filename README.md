@@ -7,8 +7,11 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/SnBuenafe/hotrstuff/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/R-CMD-check.yaml)
-[![test-coverage](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml)
+[![Ubuntu](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Ubuntu.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Ubuntu.yaml)
+[![MacOS](https://github.com/SnBuenafe/hotrstuff/actions/workflows/MacOS.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/MacOS.yaml)
+[![Windows](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Windows.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Windows.yaml)
+[![Codecov test
+coverage](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 
 The goal of hotrstuff is to …
