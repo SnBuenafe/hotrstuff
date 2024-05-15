@@ -65,7 +65,6 @@ styler::style_pkg()
 
 use_lifecycle_badge(stage = "experimental")
 
-
 # Github Actions
 use_github_action(name = "check-standard", badge = TRUE)
 
