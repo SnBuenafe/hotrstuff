@@ -38,17 +38,18 @@ jobs:
           use-public-rspm: true
 
       - name: Install system dependencies
-        run: brew install cdo
+        run: |
+          brew install cdo
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
           needs: check
 
-        - uses: r-lib/actions/check-r-package@v2
+      - uses: r-lib/actions/check-r-package@v2
         with:
           args: 'c("--no-manual", "--no-build-vignettes", "--ignore-vignettes")'
           build_args: 'c("--no-build-vignettes")'
           error-on: '"error"'
-          check-dir: '"check"'
+          check-dir: '"check"'            
           upload-snapshots: true
