@@ -86,3 +86,16 @@ pkgdown::build_favicons(pkg = ".", overwrite = TRUE)
 
 # Rebuild website to include favicons/logos
 devtools::build_site()
+
+
+
+# Maintenance
+
+devtools::check() # Check for errors. Run after code changes
+devtools::document() # Rebuild documentation
+devtools::build_readme() # Rebuild Readme file
+
+devtools::build_site() # Rebuild website after any changes
+
+
+
