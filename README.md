@@ -38,7 +38,7 @@ The operators include simple statistical and arithmetic functions, data
 selection and subsampling tools, and spatial interpolation. `hotrstuff`
 leverages the power of CDO, within the `R` environment.
 
-More about CDO installation can be found on the [cdo installer
+More about CDO installation can be found on the [CDO installer
 website](https://code.mpimet.mpg.de/projects/cdo/wiki#Installation-and-Supported-Platforms)
 
 #### Mac

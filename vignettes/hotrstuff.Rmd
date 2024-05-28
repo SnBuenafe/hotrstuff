@@ -16,12 +16,9 @@ knitr::opts_chunk$set(
 base_dir <- path.expand(file.path("~", "GitHub", "hotrstuff", "data-raw"))
 ```
 
-```{r setup}
-suppressPackageStartupMessages({
-  library(hotrstuff)
-  library(terra)
-  library(here)
-})
+```{r setup, message=FALSE}
+library(hotrstuff)
+library(terra)
 ```
 
 This vignette shows how you can download, wrangle, and process ESM data to calculate climate metrics. The idea is that the functions are independent of each other and can still perform their purpose without having to follow the entire workflow detailed below, from start to finish.
@@ -63,7 +60,6 @@ htr_download_ESM(
 
 We now merge files by model-variable-scenario-frequency combination.
 ```{r merge}
-
 htr_merge_files(
   indir = file.path(base_dir, "data", "raw", "tos"), # input directory
   outdir = file.path(base_dir, "data", "proc", "merged", "tos"), # output directory
@@ -79,7 +75,6 @@ So this would result in just 1 `.nc` file for each model-variable-scenario-frequ
 We now want to only keep the years we're interested in. For example, we want to make sure that for future projections, we only want to look at 2020-2100.
 
 ```{r adjust}
-
 htr_slice_period(
   indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
   outdir = file.path(base_dir, "data", "proc", "sliced", "tos"), # output directory
@@ -104,7 +99,6 @@ htr_fix_calendar(indir = file.path(base_dir, "data", "proc", "sliced", "tos")) #
 I created two functions: i) changes frequency to monthly (`monthly_frequency()`), and ii) changes frequency to yearly (`yearly_frequency()`), but because I've started with monthly data here, I didn't run `monthly_frequency()` here (but it works).
 
 ```{r monthly, eval = FALSE}
-
 htr_change_freq(
   freq = "monthly",
   indir = file.path(base_dir, "data", "proc", "sliced", "tos"), # input directory
@@ -115,7 +109,6 @@ htr_change_freq(
 Uncomment the code above if you're using daily data and changing it to a monthly frequency.
 
 ```{r yearly}
-
 htr_change_freq(
   freq = "yearly",
   indir = file.path(base_dir, "data", "proc", "sliced", "tos"), # input directory
@@ -130,7 +123,6 @@ This should create a new file that has a yearly frequency. For the rest of the a
 The climate models have different grids, so now we need to regrid and standardize the grid. This requires a base, empty raster that will be made automatically in the `regrid_esm()`.
 
 ```{r regrid}
-
 htr_regrid_esm(
   indir = file.path(base_dir, "data", "proc", "yearly", "tos"),
   outdir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
@@ -156,7 +148,6 @@ plot(model2$tos_1)
 For now, we only have 2 models, but if you have more models, you just need to input a list of the model names as a vector in the `model_list` argument.
 
 ```{r ensemble}
-
 htr_create_ensemble(
   indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"), # input directory
   outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"), # output directory
@@ -164,8 +155,8 @@ htr_create_ensemble(
   variable = "tos", # variable name
   freq = "Omon", # original frequency of data
   scenario = "ssp126", # emission scenario
-  mean = TRUE
-) # if false, takes the median
+  mean = TRUE # if false, takes the median
+)
 ```
 
 Then, we plot to see how it looks.

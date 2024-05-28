@@ -86,6 +86,7 @@ trim_period <- function(f, # file
                         year_start,
                         year_end,
                         overwrite) {
+
   dt1 <- htr_get_CMIP6_bits(f)$Year_start %>%
     as.Date()
 

@@ -4,6 +4,7 @@
 #'
 #' @author David Schoeman
 #'
+#' @noRd
 htr_mask2netCDF4 <- function(x,
                              pth = paste0(getwd(), "/", "Data"),
                              ncName = "mask.nc",
@@ -79,6 +80,7 @@ htr_make_folder <- function(folder) {
 #'
 #' @author David Schoeman and Tin Buenafe
 #'
+#' @noRd
 htr_make_blankRaster <- function(out_dir, cell_res # resolution of the cell
 ) {
 
@@ -103,6 +105,7 @@ htr_make_blankRaster <- function(out_dir, cell_res # resolution of the cell
 #'
 #' @author David Schoeman and Tin Buenafe
 #'
+#' @noRd
 htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
   . <- NULL # Stop devtools::check() complaints about NSE
 
@@ -135,6 +138,7 @@ htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
 #'
 #' @author David Schoeman and Tin Buenafe
 #'
+#' @noRd
 htr_get_meta <- function(x,
                          string # refers to the aspects extracted per climate model
 ) {
@@ -157,6 +161,7 @@ htr_get_meta <- function(x,
 #'
 #' @author David Schoeman and Tin Buenafe
 #'
+#' @noRd
 htr_get_CMIP6_bits <- function(file_name) {
   bits <- stringr::str_split(basename(file_name), "_") %>%
     unlist()
