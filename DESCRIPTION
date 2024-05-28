@@ -1,6 +1,6 @@
 Package: hotrstuff
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Facilitates the rapid download, wrangling and processing of Earth System Model (ESM) output from the Coupled Model Intercomparison Project (CMIP) 
+Version: 0.0.1
 Authors@R: c(
     person(
       given = "Kristine (Tin) C.",
