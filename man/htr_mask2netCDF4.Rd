@@ -12,12 +12,8 @@ htr_mask2netCDF4(
   dlname = "tos"
 )
 }
-\arguments{
-\item{dlname}{}
-}
 \description{
 Based on http://geog.uoregon.edu/bartlein/courses/geog490/week04-netCDF.html#create-and-write-a-netcdf-file
-pacman::p_load(tidyverse, lubridate, terra, ncdf4)
 }
 \author{
 David Schoeman

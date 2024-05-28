@@ -6,11 +6,8 @@
 \usage{
 htr_get_Years(nc_file, yr1, yr2, infold, outfold, overwrite)
 }
-\arguments{
-\item{overwrite}{}
-}
 \description{
-pacman::p_load(lubridate, tidyverse)
+Get data from range of years
 }
 \author{
 David Schoeman and Tin Buenafe

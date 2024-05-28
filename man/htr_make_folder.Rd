@@ -7,8 +7,13 @@
 htr_make_folder(folder)
 }
 \arguments{
-\item{folder}{}
+\item{folder}{Character string of folder to be created}
 }
 \description{
 Make a folder
+}
+\examples{
+\dontrun{
+htr_make_folder("~/Data/output")
+}
 }

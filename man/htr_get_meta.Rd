@@ -6,11 +6,8 @@
 \usage{
 htr_get_meta(x, string)
 }
-\arguments{
-\item{string}{}
-}
 \description{
-pacman::p_load(purrr, tidyverse)
+Get combinations of variables, frequency, experiments/scenarios, models, and variants from the netCDF files
 }
 \author{
 David Schoeman and Tin Buenafe

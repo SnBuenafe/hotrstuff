@@ -7,10 +7,20 @@
 htr_download_ESM(indir, outdir)
 }
 \arguments{
-\item{outdir}{}
+\item{indir}{Directory where input files are located}
+
+\item{outdir}{Directory where output files will be saved}
 }
 \description{
-pacman::p_load(furrr, parallel)
+Download ESM data
+}
+\examples{
+\dontrun{
+htr_download_ESM(
+indir = file.path(base_dir, "data", "raw", "wget"), # input directory
+outdir = file.path(base_dir, "data", "raw", "tos") # output directory
+)
+}
 }
 \author{
 Dave Schoeman and Tin Buenafe

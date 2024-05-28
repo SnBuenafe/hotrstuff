@@ -7,13 +7,27 @@
 htr_merge_files(indir, outdir, year_start, year_end)
 }
 \arguments{
-\item{year_end}{}
+\item{indir}{Directory where input files are located}
+
+\item{outdir}{Directory where output files will be saved}
+
+\item{year_start}{Starting year}
+
+\item{year_end}{Ending year}
 }
 \description{
 Merge files according to model, variable, frequency, scenario/experiment
 }
-\details{
-pacman::p_load(furrr, tidyverse, parallel)
+\examples{
+\dontrun{
+
+htr_merge_files(
+  indir = file.path(base_dir, "data", "raw", "tos"), # input directory
+  outdir = file.path(base_dir, "data", "proc", "merged", "tos"), # output directory
+  year_start = 1985, # earliest year across all the scenarios considered
+  year_end = 2100 # latest year across all the scenarios considered
+)
+}
 }
 \author{
 Dave Schoeman and Tin Buenafe

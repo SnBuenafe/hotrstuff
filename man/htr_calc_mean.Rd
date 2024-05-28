@@ -7,7 +7,15 @@
 htr_calc_mean(indir, outdir, scenario, year_start, year_end)
 }
 \arguments{
-\item{year_end}{}
+\item{indir}{Directory where input files are located}
+
+\item{outdir}{Directory where output files will be saved}
+
+\item{scenario}{The CMIP scenario to be used in the analysis.}
+
+\item{year_start}{Starting year}
+
+\item{year_end}{Ending year}
 }
 \description{
 Used to calculate baseline means.

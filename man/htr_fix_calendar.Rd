@@ -7,10 +7,10 @@
 htr_fix_calendar(indir)
 }
 \arguments{
-\item{indir}{}
+\item{indir}{Directory where input files are located}
 }
 \description{
-pacman::p_load(tidyverse, ncdf4, furrr)
+Fix calendars (leap years)
 }
 \author{
 Dave Schoeman and Tin Buenafe

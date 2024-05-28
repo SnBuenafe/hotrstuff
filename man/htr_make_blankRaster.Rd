@@ -4,10 +4,7 @@
 \alias{htr_make_blankRaster}
 \title{Create a blank raster}
 \usage{
-htr_make_blankRaster(blankrast_dir, cell_res)
-}
-\arguments{
-\item{cell_res}{}
+htr_make_blankRaster(out_dir, cell_res)
 }
 \description{
 Create a blank raster

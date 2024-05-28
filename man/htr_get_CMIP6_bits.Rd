@@ -6,11 +6,8 @@
 \usage{
 htr_get_CMIP6_bits(file_name)
 }
-\arguments{
-\item{file_name}{}
-}
 \description{
-pacman::p_load(tidyverse)
+Extract CMIP6 bits from the name of the file
 }
 \author{
 David Schoeman and Tin Buenafe
