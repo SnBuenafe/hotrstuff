@@ -1,10 +1,8 @@
 #' Calculate anomalies relative to the baseline mean
 #'
-#' @param indir
-#' @param mndir
-#' @param outdir
+#' @inheritParams htr_slice_period
+#' @param mndir The directory where the baseline mean files are stored
 #'
-#' @return
 #' @export
 #'
 #' @examples

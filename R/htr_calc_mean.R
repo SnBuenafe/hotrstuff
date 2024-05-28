@@ -4,13 +4,8 @@
 #'
 #' @author Dave Schoeman and Tin Buenafe
 #'
-#' @param indir
-#' @param outdir
-#' @param scenario
-#' @param year_start
-#' @param year_end
+#' @inheritParams htr_slice_period
 #'
-#' @return
 #' @export
 #'
 #' @examples

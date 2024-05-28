@@ -139,8 +139,6 @@ scripts from your chosen CMIP6 repository. I would suggest using: <a href="https
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base_dir</span> <span class="op">&lt;-</span> <span class="st">"."</span> <span class="co"># Just start relative to this location</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/htr_make_folder.html">htr_make_folder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"raw"</span>, <span class="st">"tos"</span><span class="op">)</span><span class="op">)</span> <span class="co"># make folder</span></span>
-<span></span>
 <span><span class="fu"><a href="../reference/htr_download_ESM.html">htr_download_ESM</a></span><span class="op">(</span></span>
 <span>  indir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"raw"</span>, <span class="st">"wget"</span><span class="op">)</span>, <span class="co"># input directory</span></span>
 <span>  outdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"raw"</span>, <span class="st">"tos"</span><span class="op">)</span> <span class="co"># output directory</span></span>
@@ -152,8 +150,7 @@ scripts from your chosen CMIP6 repository. I would suggest using: <a href="https
 <p>We now merge files by model-variable-scenario-frequency
 combination.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/htr_make_folder.html">htr_make_folder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"merged"</span>, <span class="st">"tos"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/htr_merge_files.html">htr_merge_files</a></span><span class="op">(</span></span>
 <span>  indir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"raw"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># input directory</span></span>
 <span>  outdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"merged"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># output directory</span></span>
@@ -170,12 +167,11 @@ model-variable-scenario-frequency combination.</p>
 we want to make sure that for future projections, we only want to look
 at 2020-2100.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/htr_make_folder.html">htr_make_folder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"sliced"</span>, <span class="st">"tos"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/htr_slice_period.html">htr_slice_period</a></span><span class="op">(</span></span>
 <span>  indir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"merged"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># input directory</span></span>
 <span>  outdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"sliced"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># output directory</span></span>
-<span>  frq <span class="op">=</span> <span class="st">"Omon"</span>, <span class="co"># ocean, daily</span></span>
+<span>  freq <span class="op">=</span> <span class="st">"Omon"</span>, <span class="co"># ocean, daily</span></span>
 <span>  scenario <span class="op">=</span> <span class="st">"ssp"</span>,</span>
 <span>  year_start <span class="op">=</span> <span class="fl">2020</span>,</span>
 <span>  year_end <span class="op">=</span> <span class="fl">2100</span>,</span>
@@ -203,8 +199,7 @@ is to standardize the calendar across the different models.</p>
 data here, I didn’t run <code>monthly_frequency()</code> here (but it
 works).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/htr_make_folder.html">htr_make_folder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"monthly"</span>, <span class="st">"tos"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/htr_change_freq.html">htr_change_freq</a></span><span class="op">(</span></span>
 <span>  freq <span class="op">=</span> <span class="st">"monthly"</span>,</span>
 <span>  indir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"sliced"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># input directory</span></span>
@@ -213,8 +208,7 @@ works).</p>
 <p>Uncomment the code above if you’re using daily data and changing it
 to a monthly frequency.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/htr_make_folder.html">htr_make_folder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"yearly"</span>, <span class="st">"tos"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/htr_change_freq.html">htr_change_freq</a></span><span class="op">(</span></span>
 <span>  freq <span class="op">=</span> <span class="st">"yearly"</span>,</span>
 <span>  indir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"sliced"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># input directory</span></span>
@@ -230,14 +224,10 @@ rest of the analyses, I’ll only continue with the yearly data.</p>
 standardize the grid. This requires a base, empty raster that will be
 made automatically in the <code>regrid_esm()</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/htr_make_folder.html">htr_make_folder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"raw"</span>, <span class="st">"base_raster"</span><span class="op">)</span><span class="op">)</span> <span class="co"># create folder for base raster</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/htr_make_folder.html">htr_make_folder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"regridded"</span>, <span class="st">"yearly"</span>, <span class="st">"tos"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/htr_regrid_esm.html">htr_regrid_esm</a></span><span class="op">(</span></span>
 <span>  indir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"yearly"</span>, <span class="st">"tos"</span><span class="op">)</span>,</span>
 <span>  outdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"regridded"</span>, <span class="st">"yearly"</span>, <span class="st">"tos"</span><span class="op">)</span>,</span>
-<span>  blankrast_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"raw"</span>, <span class="st">"base_raster"</span><span class="op">)</span>,</span>
 <span>  cell_res <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  layer <span class="op">=</span> <span class="st">"annual"</span></span>
 <span><span class="op">)</span></span>
@@ -266,14 +256,13 @@ for the two models.</p>
 need to input a list of the model names as a vector in the
 <code>model_list</code> argument.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/htr_make_folder.html">htr_make_folder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"ensemble"</span>, <span class="st">"mean"</span>, <span class="st">"tos"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/htr_create_ensemble.html">htr_create_ensemble</a></span><span class="op">(</span></span>
 <span>  indir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"regridded"</span>, <span class="st">"yearly"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># input directory</span></span>
 <span>  outdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"ensemble"</span>, <span class="st">"mean"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># output directory</span></span>
 <span>  model_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ACCESS-ESM1-5"</span>, <span class="st">"CanESM5"</span><span class="op">)</span>, <span class="co"># list of models for ensemble</span></span>
 <span>  variable <span class="op">=</span> <span class="st">"tos"</span>, <span class="co"># variable name</span></span>
-<span>  frequency <span class="op">=</span> <span class="st">"Omon"</span>, <span class="co"># original frequency of data</span></span>
+<span>  freq <span class="op">=</span> <span class="st">"Omon"</span>, <span class="co"># original frequency of data</span></span>
 <span>  scenario <span class="op">=</span> <span class="st">"ssp126"</span>, <span class="co"># emission scenario</span></span>
 <span>  mean <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span> <span class="co"># if false, takes the median</span></span></code></pre></div>
@@ -283,6 +272,10 @@ need to input a list of the model names as a vector in the
 <span><span class="va">ensemble</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">ensemble_model</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ensemble</span><span class="op">$</span><span class="va">tos_1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hotrstuff_files/figure-html/plot_ensemble-1.png" width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="create-baseline-anomalies">Create baseline anomalies<a class="anchor" aria-label="anchor" href="#create-baseline-anomalies"></a>
+</h2>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

@@ -1,18 +1,22 @@
 #' Download ESM data
 #'
-#' pacman::p_load(furrr, parallel)
-#'
 #' @author Dave Schoeman and Tin Buenafe
+#' @inheritParams htr_slice_period
 #'
-#' @param indir
-#' @param outdir
-#'
-#' @return
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' htr_download_ESM(
+#' indir = file.path(base_dir, "data", "raw", "wget"), # input directory
+#' outdir = file.path(base_dir, "data", "raw", "tos") # output directory
+#' )
+#' }
 htr_download_ESM <- function(indir, # where wget files are located
                              outdir) { # where .nc files should be downloaded
+
+  # Create output folder if it doesn't exist
+  htr_make_folder(outdir)
 
   pth <- getwd()
 

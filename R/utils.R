@@ -1,26 +1,19 @@
 #' Function to convert a raster mask to a netCDF
 #'
-#'
 #' Based on http://geog.uoregon.edu/bartlein/courses/geog490/week04-netCDF.html#create-and-write-a-netcdf-file
-#' pacman::p_load(tidyverse, lubridate, terra, ncdf4)
 #'
 #' @author David Schoeman
 #'
-#' @param x
-#' @param pth
-#' @param ncName
-#' @param dname
-#' @param dlname
-#'
-#' @return
-#' @export
-#'
-#' @examples
-htr_mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
+htr_mask2netCDF4 <- function(x,
+                             pth = paste0(getwd(), "/", "Data"),
                              ncName = "mask.nc",
                              dname = "tos",
                              dlname = "tos") {
-  nc_name <- paste0(pth, "/", ncName) # Input netCDF
+
+  nc_name <- file.path(pth, ncName) # Input netCDF
+
+  # Ensure the directory exists
+  htr_make_folder(pth)
 
   # Temporary files
   nc1 <- nc_name %>%
@@ -56,21 +49,26 @@ htr_mask2netCDF4 <- function(x, pth = paste0(getwd(), "/", "Data"),
   ncdf4::ncatt_put(ncout, "lon", "axis", "X")
   ncdf4::ncatt_put(ncout, "lat", "axis", "Y")
   ncdf4::ncatt_put(ncout, "time", "axis", "T")
+
   system(paste0("nccopy -k 4 ", nc1, " ", nc2)) # Convert to netCDF4 "classic model" mode for CDO to be able to read it
   system(paste0("cdo -invertlat ", nc2, " ", nc_name)) # Convert to netCDF4 "classic model" mode for CDO to be able to read it
   system(paste0("rm ", nc1, " ", nc2))
+
+  return(nc_name)
 }
 
 
 
 #' Make a folder
 #'
-#' @param folder
+#' @param folder Character string of folder to be created
 #'
-#' @return
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' htr_make_folder("~/Data/output")
+#' }
 htr_make_folder <- function(folder) {
   if (!isTRUE(file.info(folder)$isdir)) dir.create(folder, recursive = TRUE)
 }
@@ -81,25 +79,17 @@ htr_make_folder <- function(folder) {
 #'
 #' @author David Schoeman and Tin Buenafe
 #'
-#' @param blankrast_dir
-#' @param cell_res
-#'
-#' @return
-#' @export
-#'
-#' @examples
-htr_make_blankRaster <- function(blankrast_dir, # directory to save the blank raster
-                                 cell_res # resolution of the cell
+htr_make_blankRaster <- function(out_dir, cell_res # resolution of the cell
 ) {
-  base_rast <- paste0(blankrast_dir, "/base_rast.nc")
+
   r <- terra::rast(resolution = cell_res)
   r[] <- 1
 
-  htr_mask2netCDF4(r,
-    pth = blankrast_dir,
-    ncName = basename(base_rast),
-    dname = "dummy",
-    dlname = "dummy"
+  base_rast <- htr_mask2netCDF4(r,
+                                pth = out_dir,
+                                ncName = "base_rast.nc",
+                                dname = "dummy",
+                                dlname = "dummy"
   ) # changes the base_rast to netcdf4
 
   return(base_rast)
@@ -111,21 +101,8 @@ htr_make_blankRaster <- function(blankrast_dir, # directory to save the blank ra
 #' Get data from range of years
 #'
 #'
-#' pacman::p_load(lubridate, tidyverse)
-#'
 #' @author David Schoeman and Tin Buenafe
 #'
-#' @param nc_file
-#' @param yr1
-#' @param yr2
-#' @param infold
-#' @param outfold
-#' @param overwrite
-#'
-#' @return
-#' @export
-#'
-#' @examples
 htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
   . <- NULL # Stop devtools::check() complaints about NSE
 
@@ -156,17 +133,8 @@ htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
 
 #' Get combinations of variables, frequency, experiments/scenarios, models, and variants from the netCDF files
 #'
-#' pacman::p_load(purrr, tidyverse)
-#'
 #' @author David Schoeman and Tin Buenafe
 #'
-#' @param x
-#' @param string
-#'
-#' @return
-#' @export
-#'
-#' @examples
 htr_get_meta <- function(x,
                          string # refers to the aspects extracted per climate model
 ) {
@@ -187,15 +155,8 @@ htr_get_meta <- function(x,
 
 #' Extract CMIP6 bits from the name of the file
 #'
-#' pacman::p_load(tidyverse)
-#'
 #' @author David Schoeman and Tin Buenafe
-#' @param file_name
 #'
-#' @return
-#' @export
-#'
-#' @examples
 htr_get_CMIP6_bits <- function(file_name) {
   bits <- stringr::str_split(basename(file_name), "_") %>%
     unlist()
@@ -226,5 +187,4 @@ htr_get_CMIP6_bits <- function(file_name) {
     Year_end = date_start_stop[2]
   )
   return(output)
-  # e.g., map_df(dir(folder), htr_get_CMIP6_bits)
 }

@@ -51,13 +51,45 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">htr_slice_period</span><span class="op">(</span><span class="va">indir</span>, <span class="va">outdir</span>, <span class="va">frq</span>, <span class="va">scenario</span>, <span class="va">year_start</span>, <span class="va">year_end</span>, <span class="va">overwrite</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">htr_slice_period</span><span class="op">(</span></span>
+<span>  <span class="va">indir</span>,</span>
+<span>  <span class="va">outdir</span>,</span>
+<span>  <span class="va">freq</span>,</span>
+<span>  <span class="va">scenario</span>,</span>
+<span>  <span class="va">year_start</span>,</span>
+<span>  <span class="va">year_end</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>overwrite</dt>
-<dd></dd>
+    <dl><dt>indir</dt>
+<dd><p>Directory where input files are located</p></dd>
+
+
+<dt>outdir</dt>
+<dd><p>Directory where output files will be saved</p></dd>
+
+
+<dt>freq</dt>
+<dd><p>The temporal frequency to be used in the analysis</p></dd>
+
+
+<dt>scenario</dt>
+<dd><p>The CMIP scenario to be used in the analysis.</p></dd>
+
+
+<dt>year_start</dt>
+<dd><p>Starting year</p></dd>
+
+
+<dt>year_end</dt>
+<dd><p>Ending year</p></dd>
+
+
+<dt>overwrite</dt>
+<dd><p>Should the output files be overwritten if they already exist (defaults to TRUE)</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -65,6 +97,21 @@
     <p>Dave Schoeman and Tin Buenafe</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu">htr_slice_period</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  indir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"merged"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># input directory</span></span></span>
+<span class="r-in"><span>outdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">base_dir</span>, <span class="st">"data"</span>, <span class="st">"proc"</span>, <span class="st">"sliced"</span>, <span class="st">"tos"</span><span class="op">)</span>, <span class="co"># output directory</span></span></span>
+<span class="r-in"><span>freq <span class="op">=</span> <span class="st">"Omon"</span>, <span class="co"># ocean, daily</span></span></span>
+<span class="r-in"><span>scenario <span class="op">=</span> <span class="st">"ssp"</span>,</span></span>
+<span class="r-in"><span>year_start <span class="op">=</span> <span class="fl">2020</span>,</span></span>
+<span class="r-in"><span>year_end <span class="op">=</span> <span class="fl">2100</span>,</span></span>
+<span class="r-in"><span>overwrite <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

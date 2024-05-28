@@ -2,11 +2,8 @@
 #'
 #' @author Tin Buenafe
 #'
-#' @param freq
-#' @param indir
-#' @param outdir
+#' @inheritParams htr_slice_period
 #'
-#' @return
 #' @export
 #'
 #' @examples
@@ -14,6 +11,10 @@ htr_change_freq <- function(freq,
                             indir,
                             outdir) {
   . <- NULL # Stop devtools::check() complaints about NSE
+
+
+  # Create output folder if it doesn't exist
+  htr_make_folder(outdir)
 
   w <- parallel::detectCores() - 2
 
