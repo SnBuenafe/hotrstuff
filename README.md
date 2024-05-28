@@ -41,7 +41,7 @@ leverages the power of CDO, within the `R` environment.
 More about CDO installation can be found on the [cdo installer
 website](https://code.mpimet.mpg.de/projects/cdo/wiki#Installation-and-Supported-Platforms)
 
-### Mac
+#### Mac
 
 The easiest way to install `CDO` is using Homebrew:
 
@@ -50,7 +50,7 @@ The easiest way to install `CDO` is using Homebrew:
 More information can be found on the [CDO Mac
 Website](https://code.mpimet.mpg.de/projects/cdo/wiki/MacOS_Platform).
 
-### Windows
+#### Windows
 
 Recent versions of Windows (\>=10) included an Ubuntu embedded Linux.
 This environment offers a clean integration with the windows file
@@ -63,7 +63,7 @@ manager of Ubuntu:
 More information can be found on the [CDO Windows
 Website](https://code.mpimet.mpg.de/projects/cdo/wiki/Win32)
 
-### Unix/Linux
+#### Unix/Linux
 
     sudo apt-get upgrade
     sudo apt-get install cdo
