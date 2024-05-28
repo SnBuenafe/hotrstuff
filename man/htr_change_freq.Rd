@@ -7,7 +7,11 @@
 htr_change_freq(freq, indir, outdir)
 }
 \arguments{
-\item{outdir}{}
+\item{freq}{The temporal frequency to be used in the analysis}
+
+\item{indir}{Directory where input files are located}
+
+\item{outdir}{Directory where output files will be saved}
 }
 \description{
 Change frequency

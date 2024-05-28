@@ -2,29 +2,43 @@
 #'
 #' @author Dave Schoeman and Tin Buenafe
 #'
-#' @param indir
-#' @param outdir
-#' @param frq
-#' @param scenario
-#' @param year_start
-#' @param year_end
-#' @param overwrite
+#' @param indir Directory where input files are located
+#' @param outdir Directory where output files will be saved
+#' @param freq The temporal frequency to be used in the analysis
+#' @param scenario The CMIP scenario to be used in the analysis.
+#' @param year_start Starting year
+#' @param year_end Ending year
+#' @param overwrite Should the output files be overwritten if they already exist (defaults to TRUE)
 #'
-#' @return
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' htr_slice_period(
+#'   indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
+#' outdir = file.path(base_dir, "data", "proc", "sliced", "tos"), # output directory
+#' freq = "Omon", # ocean, daily
+#' scenario = "ssp",
+#' year_start = 2020,
+#' year_end = 2100,
+#' overwrite = FALSE
+#' )
+#' }
 htr_slice_period <- function(indir, # where the merged files are
                              outdir, # where the trimmed files will be saved
-                             frq, # frequency
+                             freq, # frequency
                              scenario, # historical or ssp
                              year_start,
                              year_end,
-                             overwrite # TRUE or FALSE
+                             overwrite = TRUE # TRUE or FALSE
 ) {
+
+  # Create output folder if it doesn't exist
+  htr_make_folder(outdir)
+
   w <- parallel::detectCores() - 2
 
-  files <- dir(indir, pattern = paste0("_", frq, "_"))
+  files <- dir(indir, pattern = paste0("_", freq, "_"))
 
   files <- files[stringr::str_detect(files, scenario)]
 
@@ -63,15 +77,6 @@ htr_slice_period <- function(indir, # where the merged files are
 #'
 #' @author Dave Schoeman and Tin Buenafe
 #'
-#' @param f
-#' @param scenario
-#' @param indir
-#' @param outdir
-#' @param year_start
-#' @param year_end
-#' @param overwrite
-#'
-#' @return
 #'
 #' @noRd
 trim_period <- function(f, # file
@@ -81,6 +86,7 @@ trim_period <- function(f, # file
                         year_start,
                         year_end,
                         overwrite) {
+
   dt1 <- htr_get_CMIP6_bits(f)$Year_start %>%
     as.Date()
 

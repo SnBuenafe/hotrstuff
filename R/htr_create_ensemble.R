@@ -1,31 +1,40 @@
 #' Create an ensemble based on list of models
 #'
-#' pacman::p_load(here, tidyverse, parallel, furrr)
+#' @inheritParams htr_slice_period
+#' @param model_list Character string of models to use for the ensemble
+#' @param variable The variable to create the ensemble for
+#' @param mean Use the mean (TRUE; default) or the median (FALSE) when creating the ensemble.
 #'
-#' @param indir
-#' @param outdir
-#' @param model_list
-#' @param variable
-#' @param frequency
-#' @param scenario
-#' @param mean
-#'
-#' @return
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' htr_create_ensemble(
+#' indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
+#' outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"),
+#' model_list = c("ACCESS-ESM1-5", "CanESM5"),
+#' variable = "tos",
+#' freq = "Omon",
+#' scenario = "ssp126",
+#' mean = TRUE
+#' )
+#' }
 htr_create_ensemble <- function(indir,
                                 outdir,
                                 model_list,
                                 variable = "tos",
-                                frequency = "Omon",
+                                freq = "Omon",
                                 scenario = "historical",
                                 mean = TRUE # if false, use median
 ) {
+
+  # Create output folder if it doesn't exist
+  htr_make_folder(outdir)
+
   w <- parallel::detectCores() - 2
 
   files <- dir(indir, full.names = TRUE) %>%
-    stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", frequency, "_", ")(?=.*", scenario, "_", ")")) %>%
+    stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", freq, "_", ")(?=.*", scenario, "_", ")")) %>%
     stringr::str_subset(paste(model_list, collapse = "|"))
 
   out_name <- files[1] %>%

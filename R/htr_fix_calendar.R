@@ -1,12 +1,10 @@
 #' Fix calendars (leap years)
 #'
-#' pacman::p_load(tidyverse, ncdf4, furrr)
 #'
 #' @author Dave Schoeman and Tin Buenafe
 #'
-#' @param indir
+#' @inheritParams htr_slice_period
 #'
-#' @return
 #' @export
 #'
 #' @examples

@@ -2,25 +2,31 @@
 #'
 #' Merge files according to model, variable, frequency, scenario/experiment
 #'
-#' pacman::p_load(furrr, tidyverse, parallel)
-#'
 #' @author Dave Schoeman and Tin Buenafe
 #'
-#' @param indir
-#' @param outdir
-#' @param year_start
-#' @param year_end
+#' @inheritParams htr_slice_period
 #'
-#' @return
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#'
+#' htr_merge_files(
+#'   indir = file.path(base_dir, "data", "raw", "tos"), # input directory
+#'   outdir = file.path(base_dir, "data", "proc", "merged", "tos"), # output directory
+#'   year_start = 1985, # earliest year across all the scenarios considered
+#'   year_end = 2100 # latest year across all the scenarios considered
+#' )
+#' }
 htr_merge_files <- function(indir, # where nc files are located
                             outdir, # where merged files should be saved
                             year_start, # start year of historical file
                             year_end # end year of projection file
 ) {
   . <- NULL # Stop devtools::check() complaints about NSE
+
+  # Create output folder if it doesn't exist
+  htr_make_folder(outdir)
 
   w <- parallel::detectCores() - 2
 

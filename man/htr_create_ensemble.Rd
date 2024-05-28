@@ -9,14 +9,39 @@ htr_create_ensemble(
   outdir,
   model_list,
   variable = "tos",
-  frequency = "Omon",
+  freq = "Omon",
   scenario = "historical",
   mean = TRUE
 )
 }
 \arguments{
-\item{mean}{}
+\item{indir}{Directory where input files are located}
+
+\item{outdir}{Directory where output files will be saved}
+
+\item{model_list}{Character string of models to use for the ensemble}
+
+\item{variable}{The variable to create the ensemble for}
+
+\item{freq}{The temporal frequency to be used in the analysis}
+
+\item{scenario}{The CMIP scenario to be used in the analysis.}
+
+\item{mean}{Use the mean (TRUE; default) or the median (FALSE) when creating the ensemble.}
 }
 \description{
-pacman::p_load(here, tidyverse, parallel, furrr)
+Create an ensemble based on list of models
+}
+\examples{
+\dontrun{
+htr_create_ensemble(
+indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
+outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"),
+model_list = c("ACCESS-ESM1-5", "CanESM5"),
+variable = "tos",
+freq = "Omon",
+scenario = "ssp126",
+mean = TRUE
+)
+}
 }

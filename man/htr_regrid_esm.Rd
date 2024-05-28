@@ -4,13 +4,30 @@
 \alias{htr_regrid_esm}
 \title{Regrid the ESMs}
 \usage{
-htr_regrid_esm(indir, outdir, blankrast_dir, cell_res = 0.25, layer)
+htr_regrid_esm(indir, outdir, cell_res = 0.25, layer)
 }
 \arguments{
-\item{layer}{}
+\item{indir}{Directory where input files are located}
+
+\item{outdir}{Directory where output files will be saved}
+
+\item{cell_res}{Resolution to which the ESM will be regridded}
+
+\item{layer}{The layer to be regridded}
 }
 \description{
-pacman::p_load(parallel, tidyverse, furrr)
+Regrid the ESMs
+}
+\examples{
+
+\dontrun{
+htr_regrid_esm(
+indir = file.path(base_dir, "data", "proc", "yearly", "tos"),
+outdir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
+cell_res = 0.25,
+layer = "annual"
+)
+}
 }
 \author{
 David Schoeman and Tin Buenafe

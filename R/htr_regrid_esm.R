@@ -1,29 +1,36 @@
 #' Regrid the ESMs
 #'
-#' pacman::p_load(parallel, tidyverse, furrr)
-#'
 #' @author David Schoeman and Tin Buenafe
 #'
-#' @param indir
-#' @param outdir
-#' @param blankrast_dir
-#' @param cell_res
-#' @param layer
+#' @inheritParams htr_slice_period
+#' @param cell_res Resolution to which the ESM will be regridded
+#' @param layer The layer to be regridded
 #'
-#' @return
 #' @export
 #'
 #' @examples
+#'
+#' \dontrun{
+#' htr_regrid_esm(
+#' indir = file.path(base_dir, "data", "proc", "yearly", "tos"),
+#' outdir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
+#' cell_res = 0.25,
+#' layer = "annual"
+#' )
+#' }
 htr_regrid_esm <- function(indir, # input directory
                            outdir, # folder to save the regridded ESM
-                           blankrast_dir, # where the blank raster would be saved
                            cell_res = 0.25, # resolution of blank raster
                            layer # which layer is being regridded (anomalies, annual, etc.?)
 ) {
+
+  # Create output folder if it doesn't exist
+  htr_make_folder(outdir)
+
   w <- parallel::detectCores() - 2
 
   base_rast <- htr_make_blankRaster(
-    blankrast_dir,
+    outdir,
     cell_res
   )
 
@@ -60,5 +67,5 @@ htr_regrid_esm <- function(indir, # input directory
   furrr::future_walk(netCDFs, remap_netCDF, base_rast, layer)
   future::plan(future::sequential)
 
-  system(paste0("rm -r ", blankrast_dir))
+  system(paste0("rm -r ", base_rast))
 }

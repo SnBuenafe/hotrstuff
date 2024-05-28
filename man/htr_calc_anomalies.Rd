@@ -7,7 +7,11 @@
 htr_calc_anomalies(indir, mndir, outdir)
 }
 \arguments{
-\item{outdir}{}
+\item{indir}{Directory where input files are located}
+
+\item{mndir}{The directory where the baseline mean files are stored}
+
+\item{outdir}{Directory where output files will be saved}
 }
 \description{
 Calculate anomalies relative to the baseline mean
