@@ -13,45 +13,57 @@ knitr::opts_chunk$set(
 )
 ```
 
-# hotrstuff <img src="man/figures/logo.png" align="right" height="139" alt="" />
+# hotrstuff <img src="man/figures/logo.png" align="right" height="139"/>
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![Ubuntu](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Ubuntu.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Ubuntu.yaml)
-[![MacOS](https://github.com/SnBuenafe/hotrstuff/actions/workflows/MacOS.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/MacOS.yaml)
-[![Windows](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Windows.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Windows.yaml)
-[![Codecov test coverage](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml)
+
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) [![Ubuntu](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Ubuntu.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Ubuntu.yaml) [![MacOS](https://github.com/SnBuenafe/hotrstuff/actions/workflows/MacOS.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/MacOS.yaml) [![Windows](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Windows.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Windows.yaml)
+
+<!--[![Codecov test coverage](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml) -->
+
 <!-- badges: end -->
 
-The goal of hotrstuff is to ...
+The goal of `hotrstuff` is to facilitate the rapid download, wrangling and processing of Earth System Model (ESM) output from the Coupled Model Intercomparison Project (CMIP).
+
+To get started, you will need to download the wget scripts from your chosen CMIP6 repository. We use: <https://aims2.llnl.gov/search>. From there `hotrstuff` makes it easy to:
+
+-   Download,\
+-   Merge files,\
+-   Regrid to chosen resolution,\
+-   Slice to required timeframe,\
+-   Crop to requested spatial area,\
+-   Create mean/median ensembles of variables, scenarios etc.
 
 ## Requirements
 
-hotrstuff requires cdo to be installed. More about cdo installation can be found on the [cdo installer website](https://code.mpimet.mpg.de/projects/cdo/wiki#Installation-and-Supported-Platforms)
+`hotrstuff` requires the Climate Data Operators (CDO) software to be installed prior to use. The CDO software is a collection of many operators for standard processing of climate and forecast model data. The operators include simple statistical and arithmetic functions, data selection and subsampling tools, and spatial interpolation. `hotrstuff` leverages the power of CDO, within the `R` environment.
+
+More about CDO installation can be found on the [cdo installer website](https://code.mpimet.mpg.de/projects/cdo/wiki#Installation-and-Supported-Platforms)
 
 ### Mac
 
-The easiest way to install `cdo` is using Homebrew:
+The easiest way to install `CDO` is using Homebrew:
 
-```
+```         
 brew install cdo
 ```
+
 More information can be found on the [CDO Mac Website](https://code.mpimet.mpg.de/projects/cdo/wiki/MacOS_Platform).
 
 ### Windows
 
-Recent versions of Windows (>=10) included an Ubuntu embedded Linux. This environment offers a clean integration with the windows file systems and and the opportunity to install CDO via the native package manager of Ubuntu:
-```
+Recent versions of Windows (\>=10) included an Ubuntu embedded Linux. This environment offers a clean integration with the windows file systems and and the opportunity to install CDO via the native package manager of Ubuntu:
+
+```         
 sudo apt-get upgrade
 sudo apt-get install cdo
 ```
 
 More information can be found on the [CDO Windows Website](https://code.mpimet.mpg.de/projects/cdo/wiki/Win32)
 
-
 ### Unix/Linux
 
-```
+```         
 sudo apt-get upgrade
 sudo apt-get install cdo
 ```
@@ -67,13 +79,8 @@ devtools::install_github("SnBuenafe/hotrstuff")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-library(hotrstuff)
-## basic example code
-```
-
+To get started with `hotrstuff`, follow the vignette [here](https://snbuenafe.github.io/hotrstuff/articles/hotrstuff.html).
 
 ## Citation
 
+Buenafe K, Schoeman D, Everett J (2024). hotrstuff: Facilitate the rapid download, wrangling and processing of Earth System Model (ESM) output from the Coupled Model Intercomparison Project (CMIP).. R package version 0.0.1, <https://github.com/SnBuenafe/hotrstuff>.
