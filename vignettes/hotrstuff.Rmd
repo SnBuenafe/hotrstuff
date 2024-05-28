@@ -53,8 +53,6 @@ Then, run the `download_ESM` function to run all the `wget` scripts found in tha
 ```{r download, eval=FALSE}
 base_dir <- "." # Just start relative to this location
 
-htr_make_folder(file.path(base_dir, "data", "raw", "tos")) # make folder
-
 htr_download_ESM(
   indir = file.path(base_dir, "data", "raw", "wget"), # input directory
   outdir = file.path(base_dir, "data", "raw", "tos") # output directory
@@ -65,7 +63,6 @@ htr_download_ESM(
 
 We now merge files by model-variable-scenario-frequency combination.
 ```{r merge}
-htr_make_folder(file.path(base_dir, "data", "proc", "merged", "tos"))
 
 htr_merge_files(
   indir = file.path(base_dir, "data", "raw", "tos"), # input directory
@@ -82,12 +79,11 @@ So this would result in just 1 `.nc` file for each model-variable-scenario-frequ
 We now want to only keep the years we're interested in. For example, we want to make sure that for future projections, we only want to look at 2020-2100.
 
 ```{r adjust}
-htr_make_folder(file.path(base_dir, "data", "proc", "sliced", "tos"))
 
 htr_slice_period(
   indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
   outdir = file.path(base_dir, "data", "proc", "sliced", "tos"), # output directory
-  frq = "Omon", # ocean, daily
+  freq = "Omon", # ocean, daily
   scenario = "ssp",
   year_start = 2020,
   year_end = 2100,
@@ -108,7 +104,6 @@ htr_fix_calendar(indir = file.path(base_dir, "data", "proc", "sliced", "tos")) #
 I created two functions: i) changes frequency to monthly (`monthly_frequency()`), and ii) changes frequency to yearly (`yearly_frequency()`), but because I've started with monthly data here, I didn't run `monthly_frequency()` here (but it works).
 
 ```{r monthly, eval = FALSE}
-htr_make_folder(file.path(base_dir, "data", "proc", "monthly", "tos"))
 
 htr_change_freq(
   freq = "monthly",
@@ -120,7 +115,6 @@ htr_change_freq(
 Uncomment the code above if you're using daily data and changing it to a monthly frequency.
 
 ```{r yearly}
-htr_make_folder(file.path(base_dir, "data", "proc", "yearly", "tos"))
 
 htr_change_freq(
   freq = "yearly",
@@ -136,14 +130,10 @@ This should create a new file that has a yearly frequency. For the rest of the a
 The climate models have different grids, so now we need to regrid and standardize the grid. This requires a base, empty raster that will be made automatically in the `regrid_esm()`.
 
 ```{r regrid}
-htr_make_folder(file.path(base_dir, "data", "raw", "base_raster")) # create folder for base raster
-
-htr_make_folder(file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"))
 
 htr_regrid_esm(
   indir = file.path(base_dir, "data", "proc", "yearly", "tos"),
   outdir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
-  blankrast_dir = file.path(base_dir, "data", "raw", "base_raster"),
   cell_res = 0.25,
   layer = "annual"
 )
@@ -166,14 +156,13 @@ plot(model2$tos_1)
 For now, we only have 2 models, but if you have more models, you just need to input a list of the model names as a vector in the `model_list` argument.
 
 ```{r ensemble}
-htr_make_folder(file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"))
 
 htr_create_ensemble(
   indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"), # input directory
   outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"), # output directory
   model_list = c("ACCESS-ESM1-5", "CanESM5"), # list of models for ensemble
   variable = "tos", # variable name
-  frequency = "Omon", # original frequency of data
+  freq = "Omon", # original frequency of data
   scenario = "ssp126", # emission scenario
   mean = TRUE
 ) # if false, takes the median
@@ -185,4 +174,12 @@ Then, we plot to see how it looks.
 ensemble_model <- list.files(file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"), full.names = TRUE)
 ensemble <- rast(ensemble_model)
 plot(ensemble$tos_1)
+```
+
+
+# Create baseline anomalies
+
+
+```{r, echo=FALSE}
+# htr_calc_anomalies()
 ```
