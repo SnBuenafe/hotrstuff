@@ -1,0 +1,176 @@
+---
+title: "hotrstuff"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{hotrstuff}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+base_dir <- path.expand(file.path("~", "GitHub", "hotrstuff", "data-raw"))
+```
+
+```{r setup, message=FALSE}
+library(hotrstuff)
+library(terra)
+```
+
+This vignette shows how you can download, wrangle, and process ESM data to calculate climate metrics. The idea is that the functions are independent of each other and can still perform their purpose without having to follow the entire workflow detailed below, from start to finish.
+
+This code works for both monthly (`mon`) and daily (`day`) climate data.
+
+I would recommend creating a `data` folder, with the following basic structure:
+
+- `data/raw/`: raw, untouched data
+- `data/raw/wget`: downloaded `wget` scripts
+- `data/raw/tos`: raw ESM data (e.g., tos - sea surface temperature)
+- `data/proc/`: processed ESM data
+- `data/proc/merged`: merged files per model - 1 model per model/variable/scenario/frequency combination
+- `data/proc/sliced`: sliced files depending on the required time period
+- `data/proc/yearly`: yearly data (after converting monthly frequency to yearly frequency)
+- `data/proc/regridded`: regridded data, standardizing grids of data
+- `data/proc/ensemble`: ensemble mean/median for each variable/scenario/frequency combination
+
+We will follow this folder structure throughout the vignette. It will still work with a different folder structure, just make sure you're inputting the right paths.
+
+# Downloading ESM outputs
+
+To download ESMs, you'd still have to download the `wget` scripts from your chosen CMIP6 repository. I would suggest using: https://aims2.llnl.gov/search.
+
+If you want to follow along, use the wget scripts that are in the `data/raw/wget` folder. But, you can use other `wget` scripts; just make sure to change the arguments.
+
+Then, run the `download_ESM` function to run all the `wget` scripts found in that folder.
+
+```{r download, eval=FALSE}
+base_dir <- "." # Just start relative to this location
+
+htr_download_ESM(
+  indir = file.path(base_dir, "data", "raw", "wget"), # input directory
+  outdir = file.path(base_dir, "data", "raw", "tos") # output directory
+)
+```
+
+# Merging files
+
+We now merge files by model-variable-scenario-frequency combination.
+```{r merge}
+htr_merge_files(
+  indir = file.path(base_dir, "data", "raw", "tos"), # input directory
+  outdir = file.path(base_dir, "data", "proc", "merged", "tos"), # output directory
+  year_start = 1985, # earliest year across all the scenarios considered (e.g., historical, ssp126, ssp245, ssp585)
+  year_end = 2100 # latest year across all the scenarios considered
+)
+```
+
+So this would result in just 1 `.nc` file for each model-variable-scenario-frequency combination.
+
+# Adjust and reframe time periods
+
+We now want to only keep the years we're interested in. For example, we want to make sure that for future projections, we only want to look at 2020-2100.
+
+```{r adjust}
+htr_slice_period(
+  indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
+  outdir = file.path(base_dir, "data", "proc", "sliced", "tos"), # output directory
+  freq = "Omon", # ocean, daily
+  scenario = "ssp",
+  year_start = 2020,
+  year_end = 2100,
+  overwrite = FALSE
+)
+```
+
+# Fix calendar periods (if needed)
+
+This function fixes the calendar days, for days with leap years. This is to standardize the calendar across the different models.
+
+```{r calendar}
+htr_fix_calendar(indir = file.path(base_dir, "data", "proc", "sliced", "tos")) # will be rewritten
+```
+
+# Changing frequency of climate data
+
+I created two functions: i) changes frequency to monthly (`monthly_frequency()`), and ii) changes frequency to yearly (`yearly_frequency()`), but because I've started with monthly data here, I didn't run `monthly_frequency()` here (but it works).
+
+```{r monthly, eval = FALSE}
+htr_change_freq(
+  freq = "monthly",
+  indir = file.path(base_dir, "data", "proc", "sliced", "tos"), # input directory
+  outdir = file.path(base_dir, "data", "proc", "yearly", "tos")
+)
+```
+
+Uncomment the code above if you're using daily data and changing it to a monthly frequency.
+
+```{r yearly}
+htr_change_freq(
+  freq = "yearly",
+  indir = file.path(base_dir, "data", "proc", "sliced", "tos"), # input directory
+  outdir = file.path(base_dir, "data", "proc", "yearly", "tos")
+)
+```
+
+This should create a new file that has a yearly frequency. For the rest of the analyses, I'll only continue with the yearly data.
+
+# Regridding
+
+The climate models have different grids, so now we need to regrid and standardize the grid. This requires a base, empty raster that will be made automatically in the `regrid_esm()`.
+
+```{r regrid}
+htr_regrid_esm(
+  indir = file.path(base_dir, "data", "proc", "yearly", "tos"),
+  outdir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
+  cell_res = 0.25,
+  layer = "annual"
+)
+```
+
+Let's try to plot this. Just plotting for the first time point and for the two models.
+
+```{r plot_regridded}
+getwd()
+models <- list.files(file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"), full.names = TRUE)
+model1 <- terra::rast(models[1])
+plot(model1$tos_1)
+
+model2 <- rast(models[2])
+plot(model2$tos_1)
+```
+
+# Create ensemble
+
+For now, we only have 2 models, but if you have more models, you just need to input a list of the model names as a vector in the `model_list` argument.
+
+```{r ensemble}
+htr_create_ensemble(
+  indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"), # input directory
+  outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"), # output directory
+  model_list = c("ACCESS-ESM1-5", "CanESM5"), # list of models for ensemble
+  variable = "tos", # variable name
+  freq = "Omon", # original frequency of data
+  scenario = "ssp126", # emission scenario
+  mean = TRUE # if false, takes the median
+)
+```
+
+Then, we plot to see how it looks.
+
+```{r plot_ensemble}
+ensemble_model <- list.files(file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"), full.names = TRUE)
+ensemble <- rast(ensemble_model)
+plot(ensemble$tos_1)
+```
+
+
+# Create baseline anomalies
+
+
+```{r, echo=FALSE}
+# htr_calc_anomalies()
+```
