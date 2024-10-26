@@ -11,6 +11,7 @@ htr_create_ensemble(
   variable = "tos",
   freq = "Omon",
   scenario = "historical",
+  season = "",
   mean = TRUE
 )
 }
@@ -26,6 +27,8 @@ htr_create_ensemble(
 \item{freq}{The temporal frequency to be used in the analysis}
 
 \item{scenario}{The CMIP scenario to be used in the analysis.}
+
+\item{season}{If using seasonal frequency, input the season name to detect the files}
 
 \item{mean}{Use the mean (TRUE; default) or the median (FALSE) when creating the ensemble.}
 }

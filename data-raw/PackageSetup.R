@@ -28,6 +28,7 @@ use_r("htr_merge_files.R")
 use_r("htr_regrid_esm.R")
 use_r("htr_slice_period.R")
 use_r("htr_change_freq.R") # Merge monthly/yearly freq
+use_r("htr_shift_years.R")
 
 devtools::check()
 
@@ -92,6 +93,7 @@ devtools::build_site()
 # Maintenance
 
 devtools::check() # Check for errors. Run after code changes
+devtools::install() # To install the R package in dev
 devtools::document() # Rebuild documentation
 devtools::build_readme() # Rebuild Readme file
 

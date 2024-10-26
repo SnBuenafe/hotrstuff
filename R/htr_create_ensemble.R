@@ -1,9 +1,11 @@
 #' Create an ensemble based on list of models
 #'
+#'
 #' @inheritParams htr_slice_period
 #' @param model_list Character string of models to use for the ensemble
 #' @param variable The variable to create the ensemble for
 #' @param mean Use the mean (TRUE; default) or the median (FALSE) when creating the ensemble.
+#' @param season If using seasonal frequency, input the season name to detect the files
 #'
 #' @export
 #'
@@ -25,6 +27,7 @@ htr_create_ensemble <- function(indir,
                                 variable = "tos",
                                 freq = "Omon",
                                 scenario = "historical",
+                                season = "", # default is no season
                                 mean = TRUE # if false, use median
 ) {
 
@@ -34,7 +37,7 @@ htr_create_ensemble <- function(indir,
   w <- parallel::detectCores() - 2
 
   files <- dir(indir, full.names = TRUE) %>%
-    stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", freq, "_", ")(?=.*", scenario, "_", ")")) %>%
+    stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", freq, "_", ")(?=.*", scenario, "_", ")(?=.*", season, ")")) %>%
     stringr::str_subset(paste(model_list, collapse = "|"))
 
   out_name <- files[1] %>%
