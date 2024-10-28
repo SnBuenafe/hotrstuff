@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 
 base_dir <- path.expand(file.path("~", "Documents", "GitHub", "hotrstuff", "data-raw"))
-variable = "no3os"
+variable = "uo"
 ```
 
 ```{r setup}
@@ -143,7 +143,29 @@ plot(model2[[var_name]])
 
 Looks good!
 
-# Create ensemble
+## [FOR DEPTH-RESOLVED MODELS] Define depth domains
+
+This is only applicable for depth-resolved models and this step should be skipped if only looking at surface models. We first define the depth domains using the levels. Each model has different levels.
+
+```{r show_levels}
+# Here I'm using the directory before changing the frequency to seasonal since changing frequency should not change the models.
+htr_show_levels(indir = file.path(base_dir, "data", "proc", "sliced", "omip", variable))
+```
+
+After which, we integrate values (weighted vertical means) across the selected levels for each depth domain.
+
+```{r integrate}
+# Surface
+htr_integrate_levels(indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "omip", variable),
+                     tempdir = file.path(base_dir, "data", "temporary"),
+                     outdir = file.path(base_dir, "data", "proc", "integrated", "omip", variable),
+                     min_level = 0,
+                     max_level = 35,
+                     domain_name = "" # Although we know it's the surface layer, for this particular analyses, we don't want to add any suffix.
+                     )
+```
+
+## Create ensemble
 
 Input the `model_list` for the members of the ensemble per variable.
 
@@ -156,12 +178,15 @@ The ensemble members for each variable are as follows:
 -   **sos**: ACCESS-OM2, ACCESS-OM2-025, CESM2, CMCC_CM2-HR4, CMCC-CM2-SR5, CNRM-CM6-1, CNRM-CM6-1-HR, EC-Earth3, FGOALS-f3-L, GFDL-CM4, MIROC6, MRI-ESM2-0, NorESM2-LM, TaiESM1-TIMCOM2 (n = 14)
 -   **mlotst**: ACCESS-OM2, ACCESS-OM2-025, CESM2, CMCC-CM2-HR4, CMCC-CM2-SR5, CNRM-CM6-1, CNRM-CM6-1-HR, EC-Earth3, FGOALS-f3-L, GFDL-CM4, MIROC6, MRI-ESM2-0, NorESM2-LM, TaiESM1-TIMCOM2 (n = 14)
 -   **no3os**: ACCESS-OM2, CESM2, EC-Earth3, MRI-ESM2-0, NorESM2-LM (n = 5)
+-   **po4os**: ACCESS-OM2, CESM2, EC-Earth3, MRI-ESM2-0, NorESM2-LM (n = 5)
+-   **uo**
+-   **vo**
 
 ```{r ensemble}
-ensemble <- c("ACCESS-OM2", "CESM2", "EC-Earth3", "MRI-ESM2-0", "NorESM2-LM")
+ensemble <- c("ACCESS-OM2")
 
 # January-March
-htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "omip", variable), #input directory
+htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "integrated", "omip", variable), #input directory
                     outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "omip", variable), #output directory
                     model_list = ensemble, #list of models for ensemble
                     variable = variable, #variable name

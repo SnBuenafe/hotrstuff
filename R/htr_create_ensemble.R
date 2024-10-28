@@ -6,6 +6,7 @@
 #' @param variable The variable to create the ensemble for
 #' @param mean Use the mean (TRUE; default) or the median (FALSE) when creating the ensemble.
 #' @param season If using seasonal frequency, input the season name to detect the files
+#' @param domain If using depth-resolved models, input the domain name to detect the files
 #'
 #' @export
 #'
@@ -28,6 +29,7 @@ htr_create_ensemble <- function(indir,
                                 freq = "Omon",
                                 scenario = "historical",
                                 season = "", # default is no season
+                                domain = "", # default is no domain
                                 mean = TRUE # if false, use median
 ) {
 
@@ -36,9 +38,23 @@ htr_create_ensemble <- function(indir,
 
   w <- parallel::detectCores() - 2
 
-  files <- dir(indir, full.names = TRUE) %>%
-    stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", freq, "_", ")(?=.*", scenario, "_", ")(?=.*", season, ")")) %>%
-    stringr::str_subset(paste(model_list, collapse = "|"))
+  if(stringr::str_length(domain) > 0 & stringr::str_length(season) > 0) {
+    files <- dir(indir, full.names = TRUE) %>%
+      stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", freq, "_", ")(?=.*", scenario, "_", ")(?=.*", season, "_", ")(?=.*", domain, ")")) %>%
+      stringr::str_subset(paste(model_list, collapse = "|"))
+  } else if(stringr::str_length(domain) > 0) {
+    files <- dir(indir, full.names = TRUE) %>%
+      stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", freq, "_", ")(?=.*", scenario, "_", ")(?=.*",  domain, ")")) %>%
+      stringr::str_subset(paste(model_list, collapse = "|"))
+  } else if(stringr::str_length(season) > 0) {
+    files <- dir(indir, full.names = TRUE) %>%
+      stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", freq, "_", ")(?=.*", scenario, "_", ")(?=.*",  season, ")")) %>%
+      stringr::str_subset(paste(model_list, collapse = "|"))
+  } else {
+    files <- dir(indir, full.names = TRUE) %>%
+      stringr::str_subset(paste0("(?=.*", variable, "_", ")(?=.*", freq, "_", ")(?=.*", scenario, ")")) %>%
+      stringr::str_subset(paste(model_list, collapse = "|"))
+  }
 
   out_name <- files[1] %>%
     stringr::str_replace(indir, outdir) %>%
