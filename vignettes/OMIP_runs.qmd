@@ -19,7 +19,7 @@ variable = "uo"
 
 ```{r setup}
 #library(hotrstuff)
-devtools::check() # load the hotrstuff
+devtools::check() 
 devtools::load_all() # install and load the hotrstuff package
 library(terra)
 ```
@@ -28,8 +28,11 @@ library(terra)
 
 Downloading OMIP outputs from <https://aims2.llnl.gov/> into their respective folders.
 ```{r download, echo = FALSE}
-htr_download_ESM(indir = file.path(base_dir, "data", "raw", "wget"), # input directory
-                 outdir = file.path(base_dir, "data", "raw", "omip", variable) # output directory
+
+volumes_dir <- file.path("/", "Volumes", "Expansion", "LarvaBRT_Submission2")
+
+htr_download_ESM(indir = file.path(volumes_dir, "raw", "wget"), # input directory
+                 outdir = file.path(volumes_dir, "raw", "omip", variable) # output directory
 )
 ```
 
@@ -64,8 +67,8 @@ htr_slice_period(indir = file.path(base_dir, "data", "proc", "merged", "omip", v
                  outdir = file.path(base_dir, "data", "proc", "sliced", "omip", variable), #output directory
                  freq = "Omon", #ocean, monthly
                  scenario = "omip2",
-                 year_start = 1963,
-                 year_end = 1981,
+                 year_start = 1950,
+                 year_end = 1955,
                  overwrite = FALSE
              )
 
@@ -183,7 +186,7 @@ The ensemble members for each variable are as follows:
 -   **vo**
 
 ```{r ensemble}
-ensemble <- c("ACCESS-OM2")
+ensemble <- c("ACCESS-OM2", "ACCESS-OM2-025", "EC-Earth3")
 
 # January-March
 htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "integrated", "omip", variable), #input directory
@@ -197,7 +200,7 @@ htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "integrated", "o
                 )
 
 # April-June
-htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "omip", variable), #input directory
+htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "integrated", "omip", variable), #input directory
                     outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "omip", variable), #output directory
                     model_list = ensemble, #list of models for ensemble
                     variable = variable, #variable name
@@ -208,7 +211,7 @@ htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "regridded", "ye
                 )
 
 # July-September
-htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "omip", variable), #input directory
+htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "integrated", "omip", variable), #input directory
                     outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "omip", variable), #output directory
                     model_list = ensemble, #list of models for ensemble
                     variable = variable, #variable name
@@ -219,7 +222,7 @@ htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "regridded", "ye
                 )
 
 # October-December
-htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "omip", variable), #input directory
+htr_create_ensemble(indir = file.path(base_dir, "data", "proc", "integrated", "omip", variable), #input directory
                     outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "omip", variable), #output directory
                     model_list = ensemble, #list of models for ensemble
                     variable = variable, #variable name

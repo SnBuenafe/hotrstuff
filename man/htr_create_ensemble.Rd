@@ -12,6 +12,7 @@ htr_create_ensemble(
   freq = "Omon",
   scenario = "historical",
   season = "",
+  domain = "",
   mean = TRUE
 )
 }
@@ -29,6 +30,8 @@ htr_create_ensemble(
 \item{scenario}{The CMIP scenario to be used in the analysis.}
 
 \item{season}{If using seasonal frequency, input the season name to detect the files}
+
+\item{domain}{If using depth-resolved models, input the domain name to detect the files}
 
 \item{mean}{Use the mean (TRUE; default) or the median (FALSE) when creating the ensemble.}
 }
