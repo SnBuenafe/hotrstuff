@@ -1,5 +1,7 @@
 #' Get the weighted vertical means
 #'
+#' hjfjhfjhf
+#'
 #' @inheritParams htr_seasonal_frequency
 #' @param min_level Minimum level of depth domain
 #' @param max_level Maximum level of depth domain

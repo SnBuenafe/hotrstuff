@@ -27,7 +27,7 @@ htr_integrate_levels(
 \item{domain_name}{Depth domain name}
 }
 \description{
-Get the weighted vertical means
+hjfjhfjhf
 }
 \examples{
 \dontrun{
