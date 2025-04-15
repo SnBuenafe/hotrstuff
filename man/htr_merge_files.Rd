@@ -4,9 +4,11 @@
 \alias{htr_merge_files}
 \title{Merge Files}
 \usage{
-htr_merge_files(indir, outdir, year_start, year_end)
+htr_merge_files(hpc = NA, indir, outdir, year_start, year_end)
 }
 \arguments{
+\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+
 \item{indir}{Directory where input files are located}
 
 \item{outdir}{Directory where output files will be saved}
@@ -22,6 +24,7 @@ Merge files according to model, variable, frequency, scenario/experiment
 \dontrun{
 
 htr_merge_files(
+  hpc = NA,
   indir = file.path(base_dir, "data", "raw", "tos"), # input directory
   outdir = file.path(base_dir, "data", "proc", "merged", "tos"), # output directory
   year_start = 1985, # earliest year across all the scenarios considered

@@ -12,13 +12,15 @@
 #' \dontrun{
 #'
 #' htr_merge_files(
+#'   hpc = NA,
 #'   indir = file.path(base_dir, "data", "raw", "tos"), # input directory
 #'   outdir = file.path(base_dir, "data", "proc", "merged", "tos"), # output directory
 #'   year_start = 1985, # earliest year across all the scenarios considered
 #'   year_end = 2100 # latest year across all the scenarios considered
 #' )
 #' }
-htr_merge_files <- function(indir, # where nc files are located
+htr_merge_files <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
+                            indir, # where nc files are located
                             outdir, # where merged files should be saved
                             year_start, # start year of historical file
                             year_end # end year of projection file
@@ -28,7 +30,11 @@ htr_merge_files <- function(indir, # where nc files are located
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
 
-  w <- parallel::detectCores() - 2
+  if(!is.na(hpc)) {
+    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
+  } else {
+    w <- parallelly::availableCores(methods = "system", omit = 2)
+  }
 
   l <- htr_get_meta(indir, string = c("Variable", "Frequency", "Scenario", "Model", "Variant"))
 

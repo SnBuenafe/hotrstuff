@@ -43,6 +43,7 @@ Imports:
     magrittr,
     ncdf4,
     parallel,
+    parallelly,
     purrr,
     stringr,
     terra

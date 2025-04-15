@@ -40,6 +40,7 @@ use_package("stringr")
 use_package("future")
 use_package("purrr")
 use_package("dplyr")
+use_package("parallelly")
 
 devtools::build_readme()
 
