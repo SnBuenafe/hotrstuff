@@ -4,9 +4,21 @@
 \alias{htr_seasonal_frequency}
 \title{Change frequency to seasonal frequency}
 \usage{
-htr_seasonal_frequency(indir, tempdir, outdir, months, months_name)
+htr_seasonal_frequency(
+  hpc = NA,
+  file = NA,
+  indir,
+  tempdir,
+  outdir,
+  months,
+  months_name
+)
 }
 \arguments{
+\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+
+\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+
 \item{indir}{Directory where input files are located}
 
 \item{tempdir}{Temporary directory where specific months are selected}
@@ -22,8 +34,11 @@ Change frequency to seasonal frequency
 }
 \examples{
 \dontrun{
-htr_seasonal_frequency(indir = here("data", "proc", "sliced", "omip", variable),
-tempdir = here("data", "temporary"), # you can also have this as a folder that isn't temporary, you just need to delete the line of code below that deletes all the files in this folder. `tempdir` holds the files that selects the particular months of interest for the specific season
+htr_seasonal_frequency(
+hpc = NA,
+file = NA,
+indir = here("data", "proc", "sliced", "omip", variable),
+tempdir = here("data", "temporary"),
 outdir = here("data", "proc", "seasonal", "omip", variable),
 months = c("01", "02", "03"), # define season (in numbered format)
 months_name = "jan-mar" # define season name

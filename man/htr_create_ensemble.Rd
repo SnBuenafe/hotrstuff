@@ -5,6 +5,7 @@
 \title{Create an ensemble based on list of models}
 \usage{
 htr_create_ensemble(
+  hpc = NA,
   indir,
   outdir,
   model_list,
@@ -17,6 +18,8 @@ htr_create_ensemble(
 )
 }
 \arguments{
+\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+
 \item{indir}{Directory where input files are located}
 
 \item{outdir}{Directory where output files will be saved}
@@ -41,6 +44,7 @@ Create an ensemble based on list of models
 \examples{
 \dontrun{
 htr_create_ensemble(
+hpc = NA,
 indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
 outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"),
 model_list = c("ACCESS-ESM1-5", "CanESM5"),

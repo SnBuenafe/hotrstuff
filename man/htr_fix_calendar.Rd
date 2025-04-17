@@ -4,13 +4,27 @@
 \alias{htr_fix_calendar}
 \title{Fix calendars (leap years)}
 \usage{
-htr_fix_calendar(indir)
+htr_fix_calendar(hpc = NA, file = NA, indir)
 }
 \arguments{
+\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+
+\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+
 \item{indir}{Directory where input files are located}
 }
 \description{
 Fix calendars (leap years)
+}
+\examples{
+\dontrun{
+
+htr_fix_calendar(
+  hpc = NA,
+  file = NA,
+  indir = file.path(base_dir, "data", "merged"), # input directory
+)
+}
 }
 \author{
 Dave Schoeman and Tin Buenafe
