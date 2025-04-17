@@ -32,7 +32,6 @@ use_r("htr_shift_years.R")
 
 devtools::check()
 
-use_package("parallel")
 use_package("ncdf4")
 use_package("lubridate")
 use_package("terra")

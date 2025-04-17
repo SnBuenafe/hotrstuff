@@ -42,7 +42,6 @@ Imports:
     lubridate,
     magrittr,
     ncdf4,
-    parallel,
     parallelly,
     purrr,
     stringr,
