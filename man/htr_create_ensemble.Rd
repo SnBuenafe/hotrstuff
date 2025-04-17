@@ -5,16 +5,21 @@
 \title{Create an ensemble based on list of models}
 \usage{
 htr_create_ensemble(
+  hpc = NA,
   indir,
   outdir,
   model_list,
   variable = "tos",
   freq = "Omon",
   scenario = "historical",
+  season = "",
+  domain = "",
   mean = TRUE
 )
 }
 \arguments{
+\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+
 \item{indir}{Directory where input files are located}
 
 \item{outdir}{Directory where output files will be saved}
@@ -27,6 +32,10 @@ htr_create_ensemble(
 
 \item{scenario}{The CMIP scenario to be used in the analysis.}
 
+\item{season}{If using seasonal frequency, input the season name to detect the files}
+
+\item{domain}{If using depth-resolved models, input the domain name to detect the files}
+
 \item{mean}{Use the mean (TRUE; default) or the median (FALSE) when creating the ensemble.}
 }
 \description{
@@ -35,6 +44,7 @@ Create an ensemble based on list of models
 \examples{
 \dontrun{
 htr_create_ensemble(
+hpc = NA,
 indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
 outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"),
 model_list = c("ACCESS-ESM1-5", "CanESM5"),

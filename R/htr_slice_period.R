@@ -2,6 +2,8 @@
 #'
 #' @author Dave Schoeman and Tin Buenafe
 #'
+#' @param hpc Indicates whether the user is working in a HPC (High Performance Computing) facility
+#' @param file For when using the "array" option in the HPC, the file name needs to be specified
 #' @param indir Directory where input files are located
 #' @param outdir Directory where output files will be saved
 #' @param freq The temporal frequency to be used in the analysis
@@ -15,7 +17,8 @@
 #' @examples
 #' \dontrun{
 #' htr_slice_period(
-#'   indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
+#' hpc = NA,
+#' indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
 #' outdir = file.path(base_dir, "data", "proc", "sliced", "tos"), # output directory
 #' freq = "Omon", # ocean, daily
 #' scenario = "ssp",
@@ -24,7 +27,9 @@
 #' overwrite = FALSE
 #' )
 #' }
-htr_slice_period <- function(indir, # where the merged files are
+htr_slice_period <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
+                             file = NA, # hpc = "array", the input will be the file
+                             indir, # where the merged files are
                              outdir, # where the trimmed files will be saved
                              freq, # frequency
                              scenario, # historical or ssp
@@ -36,11 +41,14 @@ htr_slice_period <- function(indir, # where the merged files are
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
 
-  w <- parallel::detectCores() - 2
+  # Define workers
+  if(is.na(hpc)) {
+    w <- parallelly::availableCores(method = "system", omit = 2)
+  } else {
+    w <- parallelly::availableCores(method = "Slurm", omit = 2)
+  }
 
-  files <- dir(indir, pattern = paste0("_", freq, "_"))
-
-  files <- files[stringr::str_detect(files, scenario)]
+  ##############
 
   trim_timeframe <- function(f) {
     s <- htr_get_CMIP6_bits(f)$Scenario
@@ -63,9 +71,25 @@ htr_slice_period <- function(indir, # where the merged files are
     }
   }
 
-  future::plan(future::multisession, workers = w)
-  furrr::future_walk(files, trim_timeframe)
-  future::plan(future::sequential)
+  ##############
+
+  if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
+
+    file_n <- dir(indir, pattern = file, full.names = TRUE)
+    file_n <- file[stringr::str_detect(file_n, scenario)]
+
+    trim_timeframe(file_n) # run function
+
+  } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
+
+    files <- dir(indir, pattern = paste0("_", freq, "_"))
+    files <- files[stringr::str_detect(files, scenario)]
+
+    future::plan(future::multisession, workers = w)
+    furrr::future_walk(files, trim_timeframe)
+    future::plan(future::sequential)
+
+  }
 }
 
 

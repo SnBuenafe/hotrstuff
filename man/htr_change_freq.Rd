@@ -4,9 +4,13 @@
 \alias{htr_change_freq}
 \title{Change frequency}
 \usage{
-htr_change_freq(freq, indir, outdir)
+htr_change_freq(hpc = NA, file = NA, freq, indir, outdir)
 }
 \arguments{
+\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+
+\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+
 \item{freq}{The temporal frequency to be used in the analysis}
 
 \item{indir}{Directory where input files are located}
@@ -15,6 +19,15 @@ htr_change_freq(freq, indir, outdir)
 }
 \description{
 Change frequency
+}
+\examples{
+htr_change_freq(
+hpc = NA,
+file = NA,
+freq = "monthly",
+indir = here("data", "proc", "sliced", variable),
+outdir = here("data", "proc", "monthly", variable)
+)
 }
 \author{
 Tin Buenafe

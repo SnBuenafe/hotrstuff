@@ -8,11 +8,13 @@
 #' @examples
 #' \dontrun{
 #' htr_download_ESM(
+#' hpc = NA,
 #' indir = file.path(base_dir, "data", "raw", "wget"), # input directory
 #' outdir = file.path(base_dir, "data", "raw", "tos") # output directory
 #' )
 #' }
-htr_download_ESM <- function(indir, # where wget files are located
+htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
+                             indir, # where wget files are located
                              outdir) { # where .nc files should be downloaded
 
   # Create output folder if it doesn't exist
@@ -20,9 +22,12 @@ htr_download_ESM <- function(indir, # where wget files are located
 
   pth <- getwd()
 
-  w <- parallel::detectCores() - 2
-
-  files <- dir(indir, pattern = "wget", full.names = TRUE)
+  # Define workers
+  if(is.na(hpc)) {
+    w <- parallelly::availableCores(methods = "system", omit = 2)
+  } else {
+    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
+  }
 
   ##############
 
@@ -33,6 +38,8 @@ htr_download_ESM <- function(indir, # where wget files are located
   }
 
   ##############
+
+  files <- dir(indir, pattern = "wget", full.names = TRUE)
 
   future::plan(future::multisession, workers = w)
   furrr::future_walk(files, wget_files)

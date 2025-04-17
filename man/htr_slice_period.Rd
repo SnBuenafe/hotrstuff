@@ -5,6 +5,8 @@
 \title{Slice Period}
 \usage{
 htr_slice_period(
+  hpc = NA,
+  file = NA,
   indir,
   outdir,
   freq,
@@ -15,6 +17,10 @@ htr_slice_period(
 )
 }
 \arguments{
+\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+
+\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+
 \item{indir}{Directory where input files are located}
 
 \item{outdir}{Directory where output files will be saved}
@@ -35,7 +41,8 @@ Slice Period
 \examples{
 \dontrun{
 htr_slice_period(
-  indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
+hpc = NA,
+indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
 outdir = file.path(base_dir, "data", "proc", "sliced", "tos"), # output directory
 freq = "Omon", # ocean, daily
 scenario = "ssp",

@@ -7,7 +7,16 @@
 #' @export
 #'
 #' @examples
-htr_change_freq <- function(freq,
+#' htr_change_freq(
+#' hpc = NA,
+#' file = NA,
+#' freq = "monthly",
+#' indir = here("data", "proc", "sliced", variable),
+#' outdir = here("data", "proc", "monthly", variable)
+#' )
+htr_change_freq <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
+                            file = NA, # hpc = "array", the input will be the file
+                            freq, # possible values are "yearly" or "monthly"
                             indir,
                             outdir) {
   . <- NULL # Stop devtools::check() complaints about NSE
@@ -16,9 +25,12 @@ htr_change_freq <- function(freq,
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
 
-  w <- parallel::detectCores() - 2
-
-  esms <- dir(indir, pattern = "*.nc", full.names = TRUE)
+  # Define workers
+  if(is.na(hpc)) {
+    w <- parallelly::availableCores(method = "system", omit = 2)
+  } else {
+    w <- parallelly::availableCores(method = "Slurm", omit = 2)
+  }
 
   ##############
 
@@ -50,6 +62,20 @@ htr_change_freq <- function(freq,
 
   ##############
 
+  if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
+
+    esm <- dir(indir, pattern = file, full.names = TRUE)
+
+    if (stringr::str_to_lower(freq) == "yearly") { # run function
+      change_yearly(esm, outdir)
+    } else if (stringr::str_to_lower(freq) == "monthly") {
+      change_monthly(esm, outdir)
+    }
+
+  } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
+
+  esms <- dir(indir, pattern = "*.nc", full.names = TRUE)
+
   future::plan(future::multisession, workers = w)
 
   if (stringr::str_to_lower(freq) == "yearly") {
@@ -59,4 +85,6 @@ htr_change_freq <- function(freq,
   }
 
   future::plan(future::sequential)
+
+  }
 }
