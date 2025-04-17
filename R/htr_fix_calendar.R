@@ -8,11 +8,17 @@
 #' @export
 #'
 #' @examples
-htr_fix_calendar <- function(indir) { # input directory
+htr_fix_calendar <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
+                             file = NA, # hpc = "array", the input will be the file
+                             indir) { # input directory
 
   . <- NULL # Stop devtools::check() complaints about NSE
 
-  w <- parallel::detectCores() - 2
+  if(is.na(hpc)) {
+    w <- parallelly::availableCores(method = "system", omit = 2)
+  } else {
+    w <- parallelly::availableCores(method = "Slurm", omit = 2)
+  }
 
   fix_cal <- function(f) {
     yrs <- ncdf4::nc_open(f) %>%
@@ -33,9 +39,13 @@ htr_fix_calendar <- function(indir) { # input directory
     }
   }
 
+  if(hpc == "array") { # For hpc == "array", use the specific files as the starting point
+    fix_cal(file)
+  } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
+    netCDFs <- dir(indir, full.names = TRUE)
+    future::plan(future::multisession, workers = w)
+    furrr::future_walk(netCDFs, fix_cal)
+    future::plan(future::sequential)
+  }
 
-  netCDFs <- dir(indir, full.names = TRUE)
-  future::plan(future::multisession, workers = w)
-  furrr::future_walk(netCDFs, fix_cal)
-  future::plan(future::sequential)
 }
