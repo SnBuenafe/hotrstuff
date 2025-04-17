@@ -12,13 +12,17 @@
 #'
 #' \dontrun{
 #' htr_regrid_esm(
+#' hpc = NA,
+#' file = NA,
 #' indir = file.path(base_dir, "data", "proc", "yearly", "tos"),
 #' outdir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
 #' cell_res = 0.25,
 #' layer = "annual"
 #' )
 #' }
-htr_regrid_esm <- function(indir, # input directory
+htr_regrid_esm <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
+                           file = NA, # hpc = "array", the input will be the file
+                           indir, # input directory
                            outdir, # folder to save the regridded ESM
                            cell_res = 0.25, # resolution of blank raster
                            layer # which layer is being regridded (anomalies, annual, etc.?)
@@ -27,15 +31,17 @@ htr_regrid_esm <- function(indir, # input directory
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
 
-  w <- parallel::detectCores() - 2
+  # Define workers
+  if(is.na(hpc)) {
+    w <- parallelly::availableCores(method = "system", omit = 2)
+  } else {
+    w <- parallelly::availableCores(method = "Slurm", omit = 2)
+  }
 
   base_rast <- htr_make_blankRaster(
     outdir,
     cell_res
   )
-
-  # Get files and remap
-  netCDFs <- dir(indir, full.names = TRUE)
 
   ##############
 
@@ -63,9 +69,22 @@ htr_regrid_esm <- function(indir, # input directory
 
   ##############
 
-  future::plan(future::multisession, workers = w)
-  furrr::future_walk(netCDFs, remap_netCDF, base_rast, layer)
-  future::plan(future::sequential)
+  if (hpc == "array") { # For hpc == "array", use the specific files as the starting point
+
+    netCDF <- dir(indir, pattern = file, full.names = TRUE)
+
+    remap_netCDF(netCDF, base_rast, layer) # run function
+
+  } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
+
+    netCDFs <- dir(indir, full.names = TRUE)
+
+    future::plan(future::multisession, workers = w)
+    furrr::future_walk(netCDFs, remap_netCDF, base_rast, layer)
+    future::plan(future::sequential)
+
+  }
 
   system(paste0("rm -r ", base_rast))
+
 }
