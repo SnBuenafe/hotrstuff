@@ -31,10 +31,10 @@ htr_merge_files <- function(hpc = NA, # if ran in the HPC, possible values are "
   htr_make_folder(outdir)
 
   # Define workers
-  if(!is.na(hpc)) {
-    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
-  } else {
+  if(is.na(hpc)) {
     w <- parallelly::availableCores(methods = "system", omit = 2)
+  } else {
+    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
   }
 
   l <- htr_get_meta(indir, string = c("Variable", "Frequency", "Scenario", "Model", "Variant"))
