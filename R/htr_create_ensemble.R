@@ -39,10 +39,10 @@ htr_create_ensemble <- function(hpc = NA, # if ran in the HPC, possible values a
   htr_make_folder(outdir)
 
   # Define workers
-  if(!is.na(hpc)) {
-    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
-  } else {
+  if(is.na(hpc)) {
     w <- parallelly::availableCores(methods = "system", omit = 2)
+  } else {
+    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
   }
 
   ##############
