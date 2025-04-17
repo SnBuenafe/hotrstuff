@@ -48,6 +48,8 @@ htr_slice_period <- function(hpc = NA, # if ran in the HPC, possible values are 
     w <- parallelly::availableCores(method = "Slurm", omit = 2)
   }
 
+  ##############
+
   trim_timeframe <- function(f) {
     s <- htr_get_CMIP6_bits(f)$Scenario
     m <- htr_get_CMIP6_bits(f)$Model
@@ -69,17 +71,24 @@ htr_slice_period <- function(hpc = NA, # if ran in the HPC, possible values are 
     }
   }
 
-  if(hpc == "array") { # For hpc == "array", use the specific files as the starting point
+  ##############
+
+  if (hpc == "array") { # For hpc == "array", use the specific files as the starting point
+
     file <- dir(indir, pattern = file, full.names = TRUE)
     file <- file[stringr::str_detect(files, scenario)]
+
     trim_timeframe(file) # run function
+
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
+
     files <- dir(indir, pattern = paste0("_", freq, "_"))
     files <- files[stringr::str_detect(files, scenario)]
 
     future::plan(future::multisession, workers = w)
     furrr::future_walk(files, trim_timeframe)
     future::plan(future::sequential)
+
   }
 }
 

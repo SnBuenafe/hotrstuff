@@ -41,6 +41,8 @@ htr_seasonal_frequency <- function(hpc = NA, # if ran in the HPC, possible value
     w <- parallelly::availableCores(method = "Slurm", omit = 2)
   }
 
+  ##############
+
   change_seasons <- function(f) {
 
     basename <- f %>%
@@ -57,11 +59,18 @@ htr_seasonal_frequency <- function(hpc = NA, # if ran in the HPC, possible value
 
   }
 
-  if(hpc == "array") { # For hpc == "array", use the specific files as the starting point
+  ##############
+
+  if (hpc == "array") { # For hpc == "array", use the specific files as the starting point
+
     esm <- dir(indir, pattern = file, full.names = TRUE)
+
     change_seasons(esm) # run function
+
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
+
     esms <- dir(indir, pattern = "*.nc", full.names = TRUE)
+
     future::plan(future::multisession, workers = w)
     furrr::future_walk(esms, change_seasons)
     future::plan(future::sequential)

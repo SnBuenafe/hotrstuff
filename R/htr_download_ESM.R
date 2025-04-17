@@ -29,8 +29,6 @@ htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are 
     w <- parallelly::availableCores(methods = "Slurm", omit = 2)
   }
 
-  files <- dir(indir, pattern = "wget", full.names = TRUE)
-
   ##############
 
   wget_files <- function(script) {
@@ -40,6 +38,8 @@ htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are 
   }
 
   ##############
+
+  files <- dir(indir, pattern = "wget", full.names = TRUE)
 
   future::plan(future::multisession, workers = w)
   furrr::future_walk(files, wget_files)

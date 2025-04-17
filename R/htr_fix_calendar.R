@@ -29,6 +29,8 @@ htr_fix_calendar <- function(hpc = NA, # if ran in the HPC, possible values are 
     w <- parallelly::availableCores(method = "Slurm", omit = 2)
   }
 
+  ##############
+
   fix_cal <- function(f) {
     yrs <- ncdf4::nc_open(f) %>%
       ncdf4::ncvar_get(., "time") %>%
@@ -48,14 +50,22 @@ htr_fix_calendar <- function(hpc = NA, # if ran in the HPC, possible values are 
     }
   }
 
-  if(hpc == "array") { # For hpc == "array", use the specific files as the starting point
+  ##############
+
+  if (hpc == "array") { # For hpc == "array", use the specific files as the starting point
+
     file <- dir(indir, pattern = file, full.names = TRUE)
+
     fix_cal(file) # run function
+
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
+
     netCDFs <- dir(indir, full.names = TRUE)
+
     future::plan(future::multisession, workers = w)
     furrr::future_walk(netCDFs, fix_cal) # run function in parallel
     future::plan(future::sequential)
+
   }
 
 }
