@@ -8,6 +8,14 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#'
+#' htr_fix_calendar(
+#'   hpc = NA,
+#'   file = NA,
+#'   indir = file.path(base_dir, "data", "merged"), # input directory
+#' )
+#' }
 htr_fix_calendar <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
                              file = NA, # hpc = "array", the input will be the file
                              indir) { # input directory
