@@ -22,6 +22,7 @@ htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are 
 
   pth <- getwd()
 
+  # Define workers
   if(is.na(hpc)) {
     w <- parallelly::availableCores(methods = "system", omit = 2)
   } else {

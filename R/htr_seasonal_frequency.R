@@ -9,14 +9,19 @@
 #'
 #' @examples
 #' \dontrun{
-#' htr_seasonal_frequency(indir = here("data", "proc", "sliced", "omip", variable),
-#' tempdir = here("data", "temporary"), # you can also have this as a folder that isn't temporary, you just need to delete the line of code below that deletes all the files in this folder. `tempdir` holds the files that selects the particular months of interest for the specific season
+#' htr_seasonal_frequency(
+#' hpc = NA,
+#' file = NA,
+#' indir = here("data", "proc", "sliced", "omip", variable),
+#' tempdir = here("data", "temporary"),
 #' outdir = here("data", "proc", "seasonal", "omip", variable),
 #' months = c("01", "02", "03"), # define season (in numbered format)
 #' months_name = "jan-mar" # define season name
 #' )
 #' }
-htr_seasonal_frequency <- function(indir,
+htr_seasonal_frequency <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
+                                   file = NA, # hpc = "array", the input will be the file
+                                   indir,
                                    tempdir,
                                    outdir,
                                    months, # define season (in numbered format)
@@ -29,7 +34,12 @@ htr_seasonal_frequency <- function(indir,
   # Create temporary folder if it doesn't exist
   htr_make_folder(tempdir)
 
-  w <- parallel::detectCores()-2
+  # Define workers
+  if(is.na(hpc)) {
+    w <- parallelly::availableCores(method = "system", omit = 2)
+  } else {
+    w <- parallelly::availableCores(method = "Slurm", omit = 2)
+  }
 
   change_seasons <- function(f) {
 
@@ -47,9 +57,14 @@ htr_seasonal_frequency <- function(indir,
 
   }
 
-  esms <- dir(indir, pattern = "*.nc", full.names = TRUE)
-  future::plan(future::multisession, workers = w)
-  furrr::future_walk(esms, change_seasons)
-  future::plan(future::sequential)
+  if(hpc == "array") { # For hpc == "array", use the specific files as the starting point
+    esm <- dir(indir, pattern = file, full.names = TRUE)
+    change_seasons(esm) # run function
+  } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
+    esms <- dir(indir, pattern = "*.nc", full.names = TRUE)
+    future::plan(future::multisession, workers = w)
+    furrr::future_walk(esms, change_seasons)
+    future::plan(future::sequential)
+  }
 
 }

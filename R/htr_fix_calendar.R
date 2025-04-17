@@ -22,6 +22,7 @@ htr_fix_calendar <- function(hpc = NA, # if ran in the HPC, possible values are 
 
   . <- NULL # Stop devtools::check() complaints about NSE
 
+  # Define workers
   if(is.na(hpc)) {
     w <- parallelly::availableCores(method = "system", omit = 2)
   } else {
@@ -48,6 +49,7 @@ htr_fix_calendar <- function(hpc = NA, # if ran in the HPC, possible values are 
   }
 
   if(hpc == "array") { # For hpc == "array", use the specific files as the starting point
+    file <- dir(indir, pattern = file, full.names = TRUE)
     fix_cal(file) # run function
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
     netCDFs <- dir(indir, full.names = TRUE)

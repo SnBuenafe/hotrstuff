@@ -41,6 +41,7 @@ htr_slice_period <- function(hpc = NA, # if ran in the HPC, possible values are 
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
 
+  # Define workers
   if(is.na(hpc)) {
     w <- parallelly::availableCores(method = "system", omit = 2)
   } else {
@@ -69,6 +70,7 @@ htr_slice_period <- function(hpc = NA, # if ran in the HPC, possible values are 
   }
 
   if(hpc == "array") { # For hpc == "array", use the specific files as the starting point
+    file <- dir(indir, pattern = file, full.names = TRUE)
     file <- file[stringr::str_detect(files, scenario)]
     trim_timeframe(file) # run function
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
