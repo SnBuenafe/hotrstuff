@@ -75,10 +75,10 @@ htr_slice_period <- function(hpc = NA, # if ran in the HPC, possible values are 
 
   if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
 
-    file <- dir(indir, pattern = file, full.names = TRUE)
-    file <- file[stringr::str_detect(files, scenario)]
+    file_n <- dir(indir, pattern = file, full.names = TRUE)
+    file_n <- file[stringr::str_detect(file_n, scenario)]
 
-    trim_timeframe(file) # run function
+    trim_timeframe(file_n) # run function
 
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
 
