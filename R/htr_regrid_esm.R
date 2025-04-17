@@ -69,7 +69,7 @@ htr_regrid_esm <- function(hpc = NA, # if ran in the HPC, possible values are "a
 
   ##############
 
-  if (hpc == "array") { # For hpc == "array", use the specific files as the starting point
+  if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
 
     netCDF <- dir(indir, pattern = file, full.names = TRUE)
 

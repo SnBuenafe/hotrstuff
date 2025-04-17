@@ -61,7 +61,7 @@ htr_seasonal_frequency <- function(hpc = NA, # if ran in the HPC, possible value
 
   ##############
 
-  if (hpc == "array") { # For hpc == "array", use the specific files as the starting point
+  if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
 
     esm <- dir(indir, pattern = file, full.names = TRUE)
 
