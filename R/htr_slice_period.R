@@ -75,8 +75,7 @@ htr_slice_period <- function(hpc = NA, # if ran in the HPC, possible values are 
 
   if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
 
-    file_n <- dir(indir, pattern = file, full.names = TRUE)
-    file_n <- file[stringr::str_detect(file_n, scenario)]
+    file_n <- file[stringr::str_detect(file, freq)]
 
     trim_timeframe(file_n) # run function
 
