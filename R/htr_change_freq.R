@@ -7,13 +7,15 @@
 #' @export
 #'
 #' @examples
+#' #' \dontrun{
 #' htr_change_freq(
 #' hpc = NA,
 #' file = NA,
 #' freq = "monthly",
-#' indir = here("data", "proc", "sliced", variable),
-#' outdir = here("data", "proc", "monthly", variable)
+#' indir = file.path(".", "data", "proc", "sliced", variable),
+#' outdir = file.path(".", data", "proc", "monthly", variable)
 #' )
+#' }
 htr_change_freq <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
                             file = NA, # hpc = "array", the input will be the file
                             freq, # possible values are "yearly" or "monthly"

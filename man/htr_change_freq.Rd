@@ -20,15 +20,6 @@ htr_change_freq(hpc = NA, file = NA, freq, indir, outdir)
 \description{
 Change frequency
 }
-\examples{
-htr_change_freq(
-hpc = NA,
-file = NA,
-freq = "monthly",
-indir = here("data", "proc", "sliced", variable),
-outdir = here("data", "proc", "monthly", variable)
-)
-}
 \author{
 Tin Buenafe
 }
