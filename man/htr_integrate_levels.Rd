@@ -5,20 +5,29 @@
 \title{Get the weighted vertical means}
 \usage{
 htr_integrate_levels(
+  hpc = NA,
+  file = NA,
   indir,
   tempdir,
   outdir,
+  select_levels = FALSE,
   min_level,
   max_level,
   domain_name = ""
 )
 }
 \arguments{
+\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+
+\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+
 \item{indir}{Directory where input files are located}
 
 \item{tempdir}{Temporary directory where specific months are selected}
 
 \item{outdir}{Directory where output files will be saved}
+
+\item{select_levels}{If select levels = TRUE, minimum and maximum levels need to be provided}
 
 \item{min_level}{Minimum level of depth domain}
 
