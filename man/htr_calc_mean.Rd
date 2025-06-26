@@ -2,23 +2,72 @@
 % Please edit documentation in R/htr_calc_mean.R
 \name{htr_calc_mean}
 \alias{htr_calc_mean}
-\title{Calculate mean of specified time period.}
+\title{Calculate temporal mean of specified time period}
 \usage{
 htr_calc_mean(indir, outdir, scenario, year_start, year_end)
 }
 \arguments{
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing merged NetCDF files to be
+time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
-\item{outdir}{Directory where output files will be saved}
+\item{outdir}{Character string. Directory where time-sliced files will be saved.}
 
-\item{scenario}{The CMIP scenario to be used in the analysis.}
+\item{scenario}{Character string. The CMIP6 scenario to process (e.g., "historical",
+"ssp126", "ssp245"). Use "historical" for calculating baseline climatological means.}
 
-\item{year_start}{Starting year}
+\item{year_start}{Numeric. Starting year for calculating the temporal mean (inclusive).}
 
-\item{year_end}{Ending year}
+\item{year_end}{Numeric. Ending year for calculating the temporal mean (inclusive).}
+}
+\value{
+No return value. The function creates mean files in the specified output directory
+with "_mean_YYYYMMDD-YYYYMMDD.nc" replacing "\emph{merged}" in the original filenames,
+where the dates represent the start and end of the averaging period.
 }
 \description{
-Used to calculate baseline means.
+This function calculates temporal means over a specified time period using CDO
+(Climate Data Operators). It is primarily used to calculate baseline climatological
+means from historical climate data, which can then be used for anomaly calculations.
+}
+\details{
+The function uses the CDO \code{timmean} operator combined with \code{selyear} to calculate
+temporal means over the specified year range. It processes files in parallel for
+efficient computation of large climate datasets. The function automatically
+generates output filenames with "\emph{mean}" and the year range in the filename.
+
+The CDO command executed is:
+\verb{cdo -L -timmean -selyear,year_start/year_end input_file output_file}
+
+Where:
+\itemize{
+\item \code{-L} enables netCDF4 compression
+\item \code{timmean} calculates the temporal mean
+\item \code{selyear} selects the specified year range
+}
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item Input files must be merged time series files (typically created by \code{\link[=htr_merge_files]{htr_merge_files()}})
+\item Uses parallel processing with (number of CPU cores - 2) workers
+\item The \code{-L} flag enables netCDF4 compression for smaller output files
+}
+}
+\examples{
+\dontrun{
+htr_calc_mean(
+  indir = file.path(base_dir, "data", "tos", "raw"),
+  outdir = file.path(base_dir, "data", "tos", "mean"),
+  scenario = "historical",
+  year_start = 1950,
+  year_end = 2014
+)
+}
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO timmean operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=180
+CDO selyear operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=124
 }
 \author{
 Dave Schoeman and Tin Buenafe

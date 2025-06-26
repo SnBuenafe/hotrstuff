@@ -2,38 +2,95 @@
 % Please edit documentation in R/htr_regrid_esm.R
 \name{htr_regrid_esm}
 \alias{htr_regrid_esm}
-\title{Regrid the ESMs}
+\title{Regrid Earth System Model outputs to a common spatial grid}
 \usage{
 htr_regrid_esm(hpc = NA, file = NA, indir, outdir, cell_res = 0.25, layer)
 }
 \arguments{
-\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NA}: Standard processing mode
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
 
-\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+\item{file}{Character string or NA. Specific file to process when \code{hpc = "array"}.
+Not used in other modes.}
 
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing merged NetCDF files to be
+time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
-\item{outdir}{Directory where output files will be saved}
+\item{outdir}{Character string. Directory where time-sliced files will be saved.}
 
-\item{cell_res}{Resolution to which the ESM will be regridded}
+\item{cell_res}{Numeric. Spatial resolution in degrees for the target grid
+(e.g., 0.25 for quarter-degree resolution, 1.0 for one-degree resolution).
+Default is 0.25 degrees.}
 
-\item{layer}{The layer to be regridded}
+\item{layer}{Character string. Description of the data layer being regridded
+(e.g., "annual", "monthly", "anomalies"). This is used for filename generation
+and progress reporting.}
+}
+\value{
+No return value. The function creates regridded files in the specified output
+directory with "Regridded" added to the layer name in the filename
+(e.g., "\emph{annual}" becomes "\emph{RegriddedAnnual}").
 }
 \description{
-Regrid the ESMs
+This function regrids climate model outputs from their native grids to a common
+regular latitude-longitude grid using CDO (Climate Data Operators). This is
+essential for comparing and combining data from different climate models that
+use different spatial grids.
+}
+\details{
+Different climate models use various spatial grids (regular lat-lon, curvilinear,
+unstructured, etc.), making direct comparison difficult. This function standardizes
+all data to a regular latitude-longitude grid using CDO interpolation methods.
+
+The function uses different CDO remapping operators based on the variable type:
+\itemize{
+\item \strong{Precipitation (\code{pr})}: Uses conservative remapping (\code{remapcon}) to preserve
+total precipitation amounts
+\item \strong{Other variables}: Uses bilinear interpolation (\code{remapbil}) for smooth interpolation
+}
+
+The process:
+\enumerate{
+\item Creates a blank raster template at the specified resolution
+\item For each input file, determines the appropriate remapping method
+\item Applies CDO remapping: \verb{cdo -s -L -remapXXX,template input output}
+\item Updates filenames to include "Regridded" prefix
+\item Cleans up the temporary template file
+}
+
+The \code{-s} flag suppresses CDO messages, and \code{-L} enables netCDF4 compression.
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item Creates a temporary grid template file that is automatically cleaned up
+\item Uses conservative remapping for precipitation to preserve mass conservation
+\item Uses bilinear interpolation for other variables (consider \code{remapdis} for some applications)
+\item Progress messages show the model and scenario being processed
+\item Uses parallel processing when \code{hpc} is not set to "array"
+}
 }
 \examples{
-
 \dontrun{
 htr_regrid_esm(
-hpc = NA,
-file = NA,
-indir = file.path(base_dir, "data", "proc", "yearly", "tos"),
-outdir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
-cell_res = 0.25,
-layer = "annual"
+  hpc = NA,
+  file = NA,
+  indir = file.path(base_dir, "data", "proc", "yearly", "tos"),
+  outdir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
+  cell_res = 0.25,
+  layer = "annual"
 )
 }
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO remapbil operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=115
+CDO remapcon operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=116
+Grid remapping methods: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#section.1.3.2
 }
 \author{
 David Schoeman and Tin Buenafe

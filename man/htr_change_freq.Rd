@@ -2,23 +2,82 @@
 % Please edit documentation in R/htr_change_freq.R
 \name{htr_change_freq}
 \alias{htr_change_freq}
-\title{Change frequency}
+\title{Change temporal frequency of climate data}
 \usage{
 htr_change_freq(hpc = NA, file = NA, freq, indir, outdir)
 }
 \arguments{
-\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NA}: Standard processing mode
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
 
-\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+\item{file}{Character string or NA. Specific file to process when \code{hpc = "array"}.
+Not used in other modes.}
 
-\item{freq}{The temporal frequency to be used in the analysis}
+\item{freq}{Character string. The target temporal frequency. Valid options are:
+\itemize{
+\item \code{"yearly"} or \code{"annual"}: Calculate annual means using CDO yearmean
+\item \code{"monthly"}: Calculate monthly means using CDO monmean
+}}
 
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing merged NetCDF files to be
+time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
-\item{outdir}{Directory where output files will be saved}
+\item{outdir}{Character string. Directory where time-sliced files will be saved.}
+}
+\value{
+No return value. The function creates frequency-converted files in the specified
+output directory with "\emph{annual}" or "\emph{monthly}" replacing "\emph{merged}" in the
+original filenames.
 }
 \description{
-Change frequency
+This function changes the temporal frequency of climate data from daily to either
+monthly or yearly averages using CDO (Climate Data Operators). It supports both
+HPC array job processing and parallel processing for efficient computation.
+}
+\details{
+The function uses CDO temporal aggregation operators to change frequency:
+\itemize{
+\item For yearly frequency: Uses \code{cdo -yearmean} to calculate annual means
+\item For monthly frequency: Uses \code{cdo -monmean} to calculate monthly means
+}
+
+The function can operate in different modes:
+\itemize{
+\item \strong{Array mode} (\code{hpc = "array"}): Processes a single specified file (useful for HPC job arrays)
+\item \strong{Parallel mode} (\code{hpc = "parallel"} or \code{hpc = NA}): Processes all files in the input directory using parallel workers
+}
+
+Output files are renamed to reflect the new temporal frequency, replacing "\emph{merged}"
+with either "\emph{annual}" or "\emph{monthly}" in the filename.
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item Input files should typically be daily frequency data for meaningful aggregation
+\item For HPC environments, set \code{hpc = "array"} and specify the \code{file} parameter
+\item Uses parallel processing when \code{hpc = NA} or \code{hpc = "parallel"}
+\item Worker count is automatically determined based on available CPU cores
+}
+}
+\examples{
+\dontrun{
+htr_change_freq(
+  hpc = NA,
+  file = NA,
+  freq = "monthly",
+  indir = file.path(".", "data", "proc", "sliced", variable),
+  outdir = file.path(".", "data", "proc", "monthly", variable)
+)
+}
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO yearmean operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=191
+CDO monmean operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=186
 }
 \author{
 Tin Buenafe

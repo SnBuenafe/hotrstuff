@@ -2,18 +2,33 @@
 % Please edit documentation in R/utils.R
 \name{htr_make_folder}
 \alias{htr_make_folder}
-\title{Make a folder}
+\title{Create directory if it doesn't exist}
 \usage{
 htr_make_folder(folder)
 }
 \arguments{
-\item{folder}{Character string of folder to be created}
+\item{folder}{Character string. Path to the directory to be created. Can be
+relative or absolute path. Parent directories will be created recursively
+if they don't exist.}
+}
+\value{
+No return value. The function creates the directory structure as needed.
 }
 \description{
-Make a folder
+This utility function creates a directory (and any necessary parent directories)
+if it doesn't already exist. It's used throughout the hotrstuff package to
+ensure output directories are available before processing.
+}
+\note{
+\itemize{
+\item Uses \code{dir.create()} with \code{recursive = TRUE} to create parent directories
+\item Checks if directory already exists before attempting creation
+\item No error is thrown if directory already exists
+}
 }
 \examples{
 \dontrun{
 htr_make_folder("~/Data/output")
+htr_make_folder("./results/processed/regridded")
 }
 }

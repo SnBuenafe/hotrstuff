@@ -1,22 +1,79 @@
-#' Change frequency to seasonal frequency
+#' Convert climate data to seasonal frequency
+#'
+#' This function converts monthly or daily climate data to seasonal averages by
+#' selecting specific months and calculating their yearly means using CDO (Climate
+#' Data Operators). This is useful for analyzing seasonal climate patterns and
+#' reducing temporal resolution for specific seasonal analyses.
+#'
+#' @details
+#' The function creates seasonal climate data through a two-step CDO process:
+#' 1. **Month selection**: Uses `cdo selmon` to select only the months that define the season
+#' 2. **Seasonal averaging**: Uses `cdo yearmonmean` to calculate yearly means across the selected months
+#'
+#' The CDO operations performed are:
+#' ```
+#' cdo selmon,month1,month2,month3 input_file temp_file
+#' cdo yearmonmean temp_file output_file
+#' ```
+#'
+#' This approach allows for flexible seasonal definitions (e.g., DJF for winter,
+#' JJA for summer, or custom seasons like monsoon periods). The function automatically
+#' updates filenames to include "_seasonal_" and the season name.
+#'
+#' Temporary files are used during processing and are stored in the specified
+#' temporary directory.
 #'
 #' @inheritParams htr_slice_period
-#' @param tempdir Temporary directory where specific months are selected
-#' @param months Define season (based in the numbered format of months)
-#' @param months_name Define seasone name for the filename's suffix
+#' @param tempdir Character string. Directory for temporary files during processing.
+#'   Used to store intermediate files after month selection before seasonal averaging.
+#' @param months Character vector. Month numbers defining the season in two-digit
+#'   format (e.g., `c("12", "01", "02")` for DJF, `c("06", "07", "08")` for JJA).
+#'   Must be zero-padded (e.g., "01" not "1").
+#' @param months_name Character string. Descriptive name for the season that will
+#'   be added to output filenames (e.g., "DJF", "JJA", "monsoon", "dry-season").
+#'
+#' @return
+#' No return value. The function creates seasonal files in the specified output
+#' directory with "_seasonal_" and the season name added to the original filenames
+#' (e.g., "_merged_" becomes "_seasonal_YYYYMMDD-YYYYMMDD_seasonname.nc").
+#'
+#' @note
+#' - Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+#' - Input data should be monthly or daily frequency for meaningful seasonal aggregation
+#' - Month numbers must be zero-padded two-digit strings ("01", "02", etc.)
+#' - Temporary files are created during processing but not automatically cleaned up
+#' - Uses parallel processing when `hpc` is not set to "array"
+#' - Ensure sufficient disk space in the temporary directory
+#'
+#' @references
+#' CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+#' CDO selmon operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=125
+#' CDO yearmonmean operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=192
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#' # Create DJF (winter) seasonal data
 #' htr_seasonal_frequency(
-#' hpc = NA,
-#' file = NA,
-#' indir = here("data", "proc", "sliced", "omip", variable),
-#' tempdir = here("data", "temporary"),
-#' outdir = here("data", "proc", "seasonal", "omip", variable),
-#' months = c("01", "02", "03"), # define season (in numbered format)
-#' months_name = "jan-mar" # define season name
+#'   hpc = NA,
+#'   file = NA,
+#'   indir = here("data", "proc", "sliced", "omip", variable),
+#'   tempdir = here("data", "temporary"),
+#'   outdir = here("data", "proc", "seasonal", "omip", variable),
+#'   months = c("12", "01", "02"), # December, January, February
+#'   months_name = "DJF" # Winter season
+#' )
+#'
+#' # Create custom monsoon season
+#' htr_seasonal_frequency(
+#'   hpc = NA,
+#'   file = NA,
+#'   indir = here("data", "proc", "sliced", "omip", variable),
+#'   tempdir = here("data", "temporary"),
+#'   outdir = here("data", "proc", "seasonal", "omip", variable),
+#'   months = c("06", "07", "08", "09"), # June through September
+#'   months_name = "monsoon"
 #' )
 #' }
 htr_seasonal_frequency <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"

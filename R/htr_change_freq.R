@@ -1,19 +1,55 @@
-#' Change frequency
+#' Change temporal frequency of climate data
+#'
+#' This function changes the temporal frequency of climate data from daily to either
+#' monthly or yearly averages using CDO (Climate Data Operators). It supports both
+#' HPC array job processing and parallel processing for efficient computation.
+#'
+#' @details
+#' The function uses CDO temporal aggregation operators to change frequency:
+#' - For yearly frequency: Uses `cdo -yearmean` to calculate annual means
+#' - For monthly frequency: Uses `cdo -monmean` to calculate monthly means
+#'
+#' The function can operate in different modes:
+#' - **Array mode** (`hpc = "array"`): Processes a single specified file (useful for HPC job arrays)
+#' - **Parallel mode** (`hpc = "parallel"` or `hpc = NA`): Processes all files in the input directory using parallel workers
+#'
+#' Output files are renamed to reflect the new temporal frequency, replacing "_merged_"
+#' with either "_annual_" or "_monthly_" in the filename.
 #'
 #' @author Tin Buenafe
 #'
 #' @inheritParams htr_slice_period
+#' @param freq Character string. The target temporal frequency. Valid options are:
+#'   - `"yearly"` or `"annual"`: Calculate annual means using CDO yearmean
+#'   - `"monthly"`: Calculate monthly means using CDO monmean
+#'
+#' @return
+#' No return value. The function creates frequency-converted files in the specified
+#' output directory with "_annual_" or "_monthly_" replacing "_merged_" in the
+#' original filenames.
+#'
+#' @note
+#' - Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+#' - Input files should typically be daily frequency data for meaningful aggregation
+#' - For HPC environments, set `hpc = "array"` and specify the `file` parameter
+#' - Uses parallel processing when `hpc = NA` or `hpc = "parallel"`
+#' - Worker count is automatically determined based on available CPU cores
+#'
+#' @references
+#' CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+#' CDO yearmean operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=191
+#' CDO monmean operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=186
 #'
 #' @export
 #'
 #' @examples
-#' #' \dontrun{
+#' \dontrun{
 #' htr_change_freq(
-#' hpc = NA,
-#' file = NA,
-#' freq = "monthly",
-#' indir = file.path(".", "data", "proc", "sliced", variable),
-#' outdir = file.path(".", data", "proc", "monthly", variable)
+#'   hpc = NA,
+#'   file = NA,
+#'   freq = "monthly",
+#'   indir = file.path(".", "data", "proc", "sliced", variable),
+#'   outdir = file.path(".", "data", "proc", "monthly", variable)
 #' )
 #' }
 htr_change_freq <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
