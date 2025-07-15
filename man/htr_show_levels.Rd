@@ -2,20 +2,67 @@
 % Please edit documentation in R/htr_show_levels.R
 \name{htr_show_levels}
 \alias{htr_show_levels}
-\title{Print depth-resolved levels}
+\title{Display vertical levels in depth-resolved climate data}
 \usage{
 htr_show_levels(indir)
 }
 \arguments{
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing 3D NetCDF files with
+vertical levels (typically ocean model outputs with depth or pressure coordinates).}
+}
+\value{
+Character vector containing the vertical level information for each file.
+Each element corresponds to one input file and contains the level values
+as returned by CDO showlevel.
 }
 \description{
-Print depth-resolved levels
+This function examines 3D ocean climate model data and displays the vertical
+levels (depths or pressure levels) available in each file using CDO (Climate
+Data Operators). This is useful for understanding the vertical structure of
+ocean models before performing depth-related operations.
+}
+\details{
+Ocean climate models use various vertical coordinate systems (depth in meters,
+pressure levels, sigma coordinates, etc.). This function uses the CDO \code{showlevel}
+operator to display the vertical levels present in each file, helping users
+understand the vertical resolution and coordinate system.
+
+The function:
+\enumerate{
+\item Processes all NetCDF files in the input directory
+\item For each file, executes \verb{cdo showlevel filename} to extract level information
+\item Prints the filename and returns the level information
+\item Collects all level information into a character vector
+}
+
+This information is essential for:
+\itemize{
+\item Understanding the vertical structure of ocean models
+\item Planning depth integration operations with \code{\link[=htr_integrate_levels]{htr_integrate_levels()}}
+\item Selecting appropriate level ranges for analysis
+}
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item Input files must be 3D data with vertical coordinate dimensions
+\item Prints filenames to console for progress tracking
+\item Level values and units depend on the model's vertical coordinate system
+\item Does not use parallel processing (processes files sequentially)
+}
 }
 \examples{
 \dontrun{
-htr_show_levels(
-indir = file.path(base_dir, "data", "proc", "sliced", "omip", variable)
+# Display levels in ocean model data
+levels_info <- htr_show_levels(
+  indir = file.path(base_dir, "data", "proc", "sliced", "omip", "thetao")
 )
+
+# View the level information
+print(levels_info)
 }
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO showlevel operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=144
 }

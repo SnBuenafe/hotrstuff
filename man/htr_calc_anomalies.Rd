@@ -7,12 +7,57 @@
 htr_calc_anomalies(indir, mndir, outdir)
 }
 \arguments{
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing merged NetCDF files to be
+time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
-\item{mndir}{The directory where the baseline mean files are stored}
+\item{mndir}{Character string. The directory where the baseline mean files are
+stored. Files should follow CMIP6 naming conventions with variable, frequency,
+and model information in the filename.}
 
-\item{outdir}{Directory where output files will be saved}
+\item{outdir}{Character string. Directory where time-sliced files will be saved.}
+}
+\value{
+No return value. The function creates anomaly files in the specified output
+directory with "\emph{anomalies}" replacing "\emph{merged}" in the original filenames.
 }
 \description{
-Calculate anomalies relative to the baseline mean
+This function calculates climate anomalies by subtracting baseline mean values
+from projection data using CDO (Climate Data Operators). It processes multiple
+climate model files in parallel, matching variables, frequencies, and models
+between the projection data and baseline means.
+}
+\details{
+The function uses the CDO \code{sub} operator to subtract baseline means from
+projection files. It automatically matches files based on variable, frequency,
+and model metadata extracted from CMIP6-formatted filenames. The process runs
+in parallel using multiple CPU cores for efficient processing of large datasets.
+
+The workflow involves:
+\enumerate{
+\item Extracting metadata from baseline mean files
+\item Finding corresponding projection files for each variable-frequency-model combination
+\item Subtracting the appropriate baseline mean from each projection file using CDO
+\item Saving results with "\emph{anomalies}" in the filename
+}
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item Input files must follow CMIP6 naming conventions for proper metadata extraction
+\item Baseline mean files and projection files must have matching variable, frequency, and model names
+\item Uses parallel processing with (number of CPU cores - 2) workers
+}
+}
+\examples{
+\dontrun{
+htr_calc_anomalies(
+  indir = file.path(base_dir, "data", "tos", "raw"),
+  indir = file.path(base_dir, "data", "tos", "mean"),
+  outdir = file.path(base_dir, "data", "tos", "anomalies")
+)
+}
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO sub operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=297
 }

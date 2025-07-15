@@ -2,7 +2,7 @@
 % Please edit documentation in R/htr_create_ensemble.R
 \name{htr_create_ensemble}
 \alias{htr_create_ensemble}
-\title{Create an ensemble based on list of models}
+\title{Create multi-model ensemble from climate model outputs}
 \usage{
 htr_create_ensemble(
   hpc = NA,
@@ -18,40 +18,95 @@ htr_create_ensemble(
 )
 }
 \arguments{
-\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NA}: Standard processing mode
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
 
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing merged NetCDF files to be
+time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
-\item{outdir}{Directory where output files will be saved}
+\item{outdir}{Character string. Directory where time-sliced files will be saved.}
 
-\item{model_list}{Character string of models to use for the ensemble}
+\item{model_list}{Character vector. Names of climate models to include in the
+ensemble. Model names must match those in the input filenames (e.g.,
+\code{c("ACCESS-ESM1-5", "CanESM5", "GFDL-ESM4")}).}
 
-\item{variable}{The variable to create the ensemble for}
+\item{variable}{Character string. The climate variable to create the ensemble for
+(e.g., "tos" for sea surface temperature, "pr" for precipitation). Default is "tos".}
 
-\item{freq}{The temporal frequency to be used in the analysis}
+\item{freq}{Character string. CMIP6 frequency identifier to filter files
+(e.g., "Omon" for ocean monthly, "day" for daily, "Amon" for atmosphere monthly).}
 
-\item{scenario}{The CMIP scenario to be used in the analysis.}
+\item{scenario}{Character string. CMIP6 scenario identifier to filter files
+(e.g., "historical", "ssp126", "ssp245", "ssp585"). Use partial strings to
+match multiple scenarios (e.g., "ssp" for all SSP scenarios).}
 
-\item{season}{If using seasonal frequency, input the season name to detect the files}
+\item{season}{Character string. Optional season name to filter files (e.g., "DJF",
+"JJA"). Only files containing this string will be included. Default is empty string (no filtering).}
 
-\item{domain}{If using depth-resolved models, input the domain name to detect the files}
+\item{domain}{Character string. Optional domain name for depth-resolved models
+(e.g., "surface", "0-100m"). Only files containing this string will be included.
+Default is empty string (no filtering).}
 
-\item{mean}{Use the mean (TRUE; default) or the median (FALSE) when creating the ensemble.}
+\item{mean}{Logical. If \code{TRUE} (default), calculates ensemble mean using CDO ensmean.
+If \code{FALSE}, calculates ensemble median using CDO ensmedian.}
+}
+\value{
+No return value. The function creates an ensemble file in the specified output
+directory with "ensemble" replacing the model name in the original filename.
 }
 \description{
-Create an ensemble based on list of models
+This function creates multi-model ensembles by combining outputs from multiple
+climate models using CDO (Climate Data Operators). It can calculate either the
+ensemble mean or median across the specified models, with support for seasonal
+and depth-resolved data filtering.
+}
+\details{
+The function uses CDO ensemble operators to combine multiple model outputs:
+\itemize{
+\item \strong{Ensemble mean}: Uses \code{cdo -ensmean} to calculate the arithmetic mean across models
+\item \strong{Ensemble median}: Uses \code{cdo -ensmedian} to calculate the median across models
+}
+
+The function automatically:
+\enumerate{
+\item Filters files based on variable, frequency, scenario, and optionally season/domain
+\item Selects only files from the specified models in \code{model_list}
+\item Creates ensemble statistics using the appropriate CDO operator
+\item Saves output with "ensemble" replacing the model name in the filename
+}
+
+Output files are compressed using zip compression (\verb{-z zip}) and use netCDF4
+format with the \code{-L} flag for efficient storage.
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item All input files must be on the same spatial grid (use \code{\link[=htr_regrid_esm]{htr_regrid_esm()}} first if needed)
+\item All input files must have the same temporal resolution and time periods
+\item Model names in \code{model_list} must exactly match those in the input filenames
+\item Uses zip compression for efficient file storage
+}
 }
 \examples{
 \dontrun{
 htr_create_ensemble(
-hpc = NA,
-indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
-outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"),
-model_list = c("ACCESS-ESM1-5", "CanESM5"),
-variable = "tos",
-freq = "Omon",
-scenario = "ssp126",
-mean = TRUE
+  hpc = NA,
+  indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
+  outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"),
+  model_list = c("ACCESS-ESM1-5", "CanESM5"),
+  variable = "tos",
+  freq = "Omon",
+  scenario = "ssp126",
+  mean = TRUE
 )
 }
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO ensmean operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=78
+CDO ensmedian operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=79
 }

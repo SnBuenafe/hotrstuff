@@ -1,11 +1,51 @@
 #' Calculate anomalies relative to the baseline mean
 #'
+#' This function calculates climate anomalies by subtracting baseline mean values
+#' from projection data using CDO (Climate Data Operators). It processes multiple
+#' climate model files in parallel, matching variables, frequencies, and models
+#' between the projection data and baseline means.
+#'
+#' @details
+#' The function uses the CDO `sub` operator to subtract baseline means from
+#' projection files. It automatically matches files based on variable, frequency,
+#' and model metadata extracted from CMIP6-formatted filenames. The process runs
+#' in parallel using multiple CPU cores for efficient processing of large datasets.
+#'
+#' The workflow involves:
+#' 1. Extracting metadata from baseline mean files
+#' 2. Finding corresponding projection files for each variable-frequency-model combination
+#' 3. Subtracting the appropriate baseline mean from each projection file using CDO
+#' 4. Saving results with "_anomalies_" in the filename
+#'
 #' @inheritParams htr_slice_period
-#' @param mndir The directory where the baseline mean files are stored
+#' @param mndir Character string. The directory where the baseline mean files are
+#'   stored. Files should follow CMIP6 naming conventions with variable, frequency,
+#'   and model information in the filename.
+#'
+#' @return
+#' No return value. The function creates anomaly files in the specified output
+#' directory with "_anomalies_" replacing "_merged_" in the original filenames.
+#'
+#' @note
+#' - Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+#' - Input files must follow CMIP6 naming conventions for proper metadata extraction
+#' - Baseline mean files and projection files must have matching variable, frequency, and model names
+#' - Uses parallel processing with (number of CPU cores - 2) workers
+#'
+#' @references
+#' CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+#' CDO sub operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=297
 #'
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' htr_calc_anomalies(
+#'   indir = file.path(base_dir, "data", "tos", "raw"),
+#'   indir = file.path(base_dir, "data", "tos", "mean"),
+#'   outdir = file.path(base_dir, "data", "tos", "anomalies")
+#' )
+#' }
 htr_calc_anomalies <- function(indir, # input directory of the projections
                                mndir, # directory of baseline mean
                                outdir # where anomalies will be saved

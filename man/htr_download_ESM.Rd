@@ -2,28 +2,72 @@
 % Please edit documentation in R/htr_download_ESM.R
 \name{htr_download_ESM}
 \alias{htr_download_ESM}
-\title{Download ESM data}
+\title{Download Earth System Model (ESM) data using wget scripts}
 \usage{
 htr_download_ESM(hpc = NA, indir, outdir)
 }
 \arguments{
-\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NA}: Standard processing mode
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
 
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing wget script files. These are
+typically bash scripts with wget commands for downloading climate data from
+remote repositories (e.g., ESGF data nodes).}
 
-\item{outdir}{Directory where output files will be saved}
+\item{outdir}{Character string. Directory where the downloaded NetCDF files will
+be saved. The function will change to this directory before executing wget scripts.}
+}
+\value{
+No return value. The function downloads NetCDF files to the specified output
+directory as defined by the wget scripts.
 }
 \description{
-Download ESM data
+This function downloads climate model data from remote repositories using wget
+scripts. It processes multiple wget scripts in parallel to efficiently download
+large climate datasets, typically from CMIP6 data nodes or similar repositories.
+}
+\details{
+The function executes bash wget scripts that contain download commands for climate
+data files. It changes the working directory to the output directory before running
+each wget script to ensure files are downloaded to the correct location.
+
+The process involves:
+\enumerate{
+\item Finding all wget script files in the input directory
+\item For each script, changing to the output directory
+\item Executing the wget script with the \code{-s} flag (silent mode)
+\item Restoring the original working directory
+}
+
+All wget scripts are processed in parallel using multiple workers for efficient
+downloading of large datasets.
+}
+\note{
+\itemize{
+\item Requires \code{wget} to be installed and accessible from the system PATH
+\item Wget scripts should be properly formatted bash scripts with appropriate download commands
+\item The function temporarily changes working directory during execution
+\item Uses parallel processing with (number of CPU cores - 2) workers
+\item Ensure sufficient disk space is available for downloaded climate data
+\item Network connectivity and access permissions to data repositories are required
+}
 }
 \examples{
 \dontrun{
 htr_download_ESM(
-hpc = NA,
-indir = file.path(base_dir, "data", "raw", "wget"), # input directory
-outdir = file.path(base_dir, "data", "raw", "tos") # output directory
+  hpc = NA,
+  indir = file.path(base_dir, "data", "raw", "wget"), # input directory
+  outdir = file.path(base_dir, "data", "raw", "tos") # output directory
 )
 }
+}
+\references{
+ESGF Data Portal: https://esgf-node.llnl.gov/projects/esgf-llnl/
+CMIP6 Data Access: https://pcmdi.llnl.gov/CMIP6/
 }
 \author{
 Dave Schoeman and Tin Buenafe
