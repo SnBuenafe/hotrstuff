@@ -1,30 +1,92 @@
-#' Slice Period
+#' Extract specific time periods from climate model data
+#'
+#' This function extracts specific time periods from merged climate model files
+#' using CDO (Climate Data Operators). It is essential for focusing analysis on
+#' particular time ranges of interest, such as future projection periods or
+#' specific historical periods.
+#'
+#' @details
+#' Climate model data often spans long time periods, but analysis typically focuses
+#' on specific time ranges. This function uses the CDO `selyear` operator to extract
+#' the specified year range from merged time series files.
+#'
+#' The function:
+#' 1. Filters files by frequency and scenario
+#' 2. For each matching file, checks if it contains data outside the target period
+#' 3. If trimming is needed, uses `cdo selyear,year_start/year_end` to extract the period
+#' 4. Updates filenames to reflect the new time range
+#' 5. Optionally removes original files if `overwrite = TRUE`
+#'
+#' The CDO command used is:
+#' `cdo selyear,year_start/year_end input_file output_file`
+#'
+#' Files are only processed if they contain data outside the specified time range,
+#' making the function efficient for large datasets.
 #'
 #' @author Dave Schoeman and Tin Buenafe
 #'
-#' @param hpc Indicates whether the user is working in a HPC (High Performance Computing) facility
-#' @param file For when using the "array" option in the HPC, the file name needs to be specified
-#' @param indir Directory where input files are located
-#' @param outdir Directory where output files will be saved
-#' @param freq The temporal frequency to be used in the analysis
-#' @param scenario The CMIP scenario to be used in the analysis.
-#' @param year_start Starting year
-#' @param year_end Ending year
-#' @param overwrite Should the output files be overwritten if they already exist (defaults to TRUE)
+#' @param hpc Character string or NA. Indicates High Performance Computing mode:
+#'   - `NA`: Standard processing mode
+#'   - `"array"`: HPC array job mode (requires `file` parameter)
+#'   - `"parallel"`: HPC parallel mode
+#' @param file Character string or NA. Specific file to process when `hpc = "array"`.
+#'   Not used in other modes.
+#' @param indir Character string. Directory containing merged NetCDF files to be
+#'   time-sliced. Files should be continuous time series created by [`htr_merge_files()`].
+#' @param outdir Character string. Directory where time-sliced files will be saved.
+#' @param freq Character string. CMIP6 frequency identifier to filter files
+#'   (e.g., "Omon" for ocean monthly, "day" for daily, "Amon" for atmosphere monthly).
+#' @param scenario Character string. CMIP6 scenario identifier to filter files
+#'   (e.g., "historical", "ssp126", "ssp245", "ssp585"). Use partial strings to
+#'   match multiple scenarios (e.g., "ssp" for all SSP scenarios).
+#' @param year_start Numeric. Starting year for the time slice (inclusive).
+#' @param year_end Numeric. Ending year for the time slice (inclusive).
+#' @param overwrite Logical. If `TRUE` (default), removes original files after
+#'   successful time slicing. If `FALSE`, keeps original files.
+#'
+#' @return
+#' No return value. The function creates time-sliced files in the specified output
+#' directory with updated filenames reflecting the new time range
+#' (e.g., "_merged_" becomes "_YYYYMMDD-YYYYMMDD.nc").
+#'
+#' @note
+#' - Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+#' - Input files must follow CMIP6 naming conventions for proper metadata extraction
+#' - Files are only processed if they contain data outside the specified time range
+#' - Uses parallel processing when `hpc` is not set to "array"
+#' - **WARNING**: Setting `overwrite = TRUE` will delete original files
+#' - Progress messages show which model and scenario combinations are being processed
+#'
+#' @references
+#' CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+#' CDO selyear operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=124
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#' # Extract 21st century projection period
 #' htr_slice_period(
-#' hpc = NA,
-#' indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
-#' outdir = file.path(base_dir, "data", "proc", "sliced", "tos"), # output directory
-#' freq = "Omon", # ocean, daily
-#' scenario = "ssp",
-#' year_start = 2020,
-#' year_end = 2100,
-#' overwrite = FALSE
+#'   hpc = NA,
+#'   indir = file.path(base_dir, "data", "proc", "merged", "tos"),
+#'   outdir = file.path(base_dir, "data", "proc", "sliced", "tos"),
+#'   freq = "Omon", # ocean monthly
+#'   scenario = "ssp",
+#'   year_start = 2020,
+#'   year_end = 2100,
+#'   overwrite = FALSE
+#' )
+#'
+#' # Extract historical baseline period
+#' htr_slice_period(
+#'   hpc = NA,
+#'   indir = file.path(base_dir, "data", "proc", "merged", "tos"),
+#'   outdir = file.path(base_dir, "data", "proc", "sliced", "tos"),
+#'   freq = "Omon",
+#'   scenario = "historical",
+#'   year_start = 1995,
+#'   year_end = 2014,
+#'   overwrite = TRUE
 #' )
 #' }
 htr_slice_period <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"

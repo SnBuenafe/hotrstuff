@@ -2,7 +2,7 @@
 % Please edit documentation in R/htr_integrate_levels.R
 \name{htr_integrate_levels}
 \alias{htr_integrate_levels}
-\title{Get the weighted vertical means}
+\title{Calculate vertical means from depth-resolved climate data}
 \usage{
 htr_integrate_levels(
   hpc = NA,
@@ -17,29 +17,99 @@ htr_integrate_levels(
 )
 }
 \arguments{
-\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NA}: Standard processing mode
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
 
-\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+\item{file}{Character string or NA. Specific file to process when \code{hpc = "array"}.
+Not used in other modes.}
 
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing merged NetCDF files to be
+time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
-\item{tempdir}{Temporary directory where specific months are selected}
+\item{tempdir}{Character string. Directory for temporary files during processing.
+Used when \code{select_levels = TRUE} to store intermediate files after level selection.}
 
-\item{outdir}{Directory where output files will be saved}
+\item{outdir}{Character string. Directory where time-sliced files will be saved.}
 
-\item{select_levels}{If select levels = TRUE, minimum and maximum levels need to be provided}
+\item{select_levels}{Logical. If \code{TRUE}, selects a specific depth range defined by
+\code{min_level} and \code{max_level} before calculating vertical means. If \code{FALSE} (default),
+integrates across all available vertical levels.}
 
-\item{min_level}{Minimum level of depth domain}
+\item{min_level}{Numeric. Minimum depth level for integration (required when
+\code{select_levels = TRUE}). Units depend on the model's vertical coordinate system.}
 
-\item{max_level}{Maximum level of depth domain}
+\item{max_level}{Numeric. Maximum depth level for integration (required when
+\code{select_levels = TRUE}). Units depend on the model's vertical coordinate system.}
 
-\item{domain_name}{Depth domain name}
+\item{domain_name}{Character string. Optional suffix to add to output filenames
+to identify the depth domain (e.g., "surface", "0-100m"). Default is empty string.}
+}
+\value{
+No return value. The function creates vertically-integrated files in the specified
+output directory. If \code{domain_name} is provided, it is added as a suffix to the
+original filename before the file extension.
 }
 \description{
-hjfjhfjhf
+This function calculates vertical (depth) means from 3D ocean climate model data
+using CDO (Climate Data Operators). It can either integrate across all vertical
+levels or select a specific depth range before calculating the vertical mean.
+}
+\details{
+The function processes depth-resolved ocean data (e.g., temperature, salinity)
+to create vertically-averaged fields. This is useful for analyzing ocean properties
+at specific depth ranges or creating depth-integrated quantities.
+
+The CDO operations performed are:
+\itemize{
+\item \strong{With level selection}: \verb{cdo select,levrange=min,max} followed by \verb{cdo vertmean}
+\item \strong{Without level selection}: \verb{cdo vertmean} directly on the full depth range
+}
+
+The function:
+\enumerate{
+\item Optionally selects a specific depth range using CDO select with levrange
+\item Calculates the vertical mean using CDO vertmean operator
+\item Adds an optional domain name suffix to output filenames
+\item Uses a temporary directory for intermediate processing when level selection is used
+}
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item Input files must be 3D ocean data with vertical levels (depth or pressure coordinates)
+\item Temporary files are automatically cleaned up after processing
+\item Uses parallel processing when \code{hpc} is not set to "array"
+\item Level selection uses CDO's levrange which works with the model's native vertical coordinates
+}
 }
 \examples{
 \dontrun{
+# Integrate all levels
+htr_integrate_levels(
+  indir = "path/to/3d/data",
+  tempdir = "path/to/temp",
+  outdir = "path/to/output",
+  select_levels = FALSE
+)
 
+# Integrate specific depth range (e.g., upper 100m)
+htr_integrate_levels(
+  indir = "path/to/3d/data",
+  tempdir = "path/to/temp",
+  outdir = "path/to/output",
+  select_levels = TRUE,
+  min_level = 0,
+  max_level = 100,
+  domain_name = "upper100m"
+)
 }
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO vertmean operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=203
+CDO select operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=123
 }

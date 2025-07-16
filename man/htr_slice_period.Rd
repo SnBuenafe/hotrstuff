@@ -2,7 +2,7 @@
 % Please edit documentation in R/htr_slice_period.R
 \name{htr_slice_period}
 \alias{htr_slice_period}
-\title{Slice Period}
+\title{Extract specific time periods from climate model data}
 \usage{
 htr_slice_period(
   hpc = NA,
@@ -17,40 +17,106 @@ htr_slice_period(
 )
 }
 \arguments{
-\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NA}: Standard processing mode
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
 
-\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+\item{file}{Character string or NA. Specific file to process when \code{hpc = "array"}.
+Not used in other modes.}
 
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing merged NetCDF files to be
+time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
-\item{outdir}{Directory where output files will be saved}
+\item{outdir}{Character string. Directory where time-sliced files will be saved.}
 
-\item{freq}{The temporal frequency to be used in the analysis}
+\item{freq}{Character string. CMIP6 frequency identifier to filter files
+(e.g., "Omon" for ocean monthly, "day" for daily, "Amon" for atmosphere monthly).}
 
-\item{scenario}{The CMIP scenario to be used in the analysis.}
+\item{scenario}{Character string. CMIP6 scenario identifier to filter files
+(e.g., "historical", "ssp126", "ssp245", "ssp585"). Use partial strings to
+match multiple scenarios (e.g., "ssp" for all SSP scenarios).}
 
-\item{year_start}{Starting year}
+\item{year_start}{Numeric. Starting year for the time slice (inclusive).}
 
-\item{year_end}{Ending year}
+\item{year_end}{Numeric. Ending year for the time slice (inclusive).}
 
-\item{overwrite}{Should the output files be overwritten if they already exist (defaults to TRUE)}
+\item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
+successful time slicing. If \code{FALSE}, keeps original files.}
+}
+\value{
+No return value. The function creates time-sliced files in the specified output
+directory with updated filenames reflecting the new time range
+(e.g., "\emph{merged}" becomes "_YYYYMMDD-YYYYMMDD.nc").
 }
 \description{
-Slice Period
+This function extracts specific time periods from merged climate model files
+using CDO (Climate Data Operators). It is essential for focusing analysis on
+particular time ranges of interest, such as future projection periods or
+specific historical periods.
+}
+\details{
+Climate model data often spans long time periods, but analysis typically focuses
+on specific time ranges. This function uses the CDO \code{selyear} operator to extract
+the specified year range from merged time series files.
+
+The function:
+\enumerate{
+\item Filters files by frequency and scenario
+\item For each matching file, checks if it contains data outside the target period
+\item If trimming is needed, uses \verb{cdo selyear,year_start/year_end} to extract the period
+\item Updates filenames to reflect the new time range
+\item Optionally removes original files if \code{overwrite = TRUE}
+}
+
+The CDO command used is:
+\verb{cdo selyear,year_start/year_end input_file output_file}
+
+Files are only processed if they contain data outside the specified time range,
+making the function efficient for large datasets.
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item Input files must follow CMIP6 naming conventions for proper metadata extraction
+\item Files are only processed if they contain data outside the specified time range
+\item Uses parallel processing when \code{hpc} is not set to "array"
+\item \strong{WARNING}: Setting \code{overwrite = TRUE} will delete original files
+\item Progress messages show which model and scenario combinations are being processed
+}
 }
 \examples{
 \dontrun{
+# Extract 21st century projection period
 htr_slice_period(
-hpc = NA,
-indir = file.path(base_dir, "data", "proc", "merged", "tos"), # input directory
-outdir = file.path(base_dir, "data", "proc", "sliced", "tos"), # output directory
-freq = "Omon", # ocean, daily
-scenario = "ssp",
-year_start = 2020,
-year_end = 2100,
-overwrite = FALSE
+  hpc = NA,
+  indir = file.path(base_dir, "data", "proc", "merged", "tos"),
+  outdir = file.path(base_dir, "data", "proc", "sliced", "tos"),
+  freq = "Omon", # ocean monthly
+  scenario = "ssp",
+  year_start = 2020,
+  year_end = 2100,
+  overwrite = FALSE
+)
+
+# Extract historical baseline period
+htr_slice_period(
+  hpc = NA,
+  indir = file.path(base_dir, "data", "proc", "merged", "tos"),
+  outdir = file.path(base_dir, "data", "proc", "sliced", "tos"),
+  freq = "Omon",
+  scenario = "historical",
+  year_start = 1995,
+  year_end = 2014,
+  overwrite = TRUE
 )
 }
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO selyear operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=124
 }
 \author{
 Dave Schoeman and Tin Buenafe

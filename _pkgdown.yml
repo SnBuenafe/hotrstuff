@@ -1,4 +1,40 @@
 url: ~
 template:
   bootstrap: 5
+development:
+  destination:
+  version_label: info
+  version_tooltip: "The package is in the early stages of development. Use with caution."
+reference:
 
+- title: Data Aquisition
+- contents:
+  - htr_download_ESM
+  - htr_shift_years
+
+- title: Temporal Data Preparation
+- contents:
+  - htr_merge_files
+  - htr_slice_period
+  - htr_fix_calendar
+
+- title: Temporal Processing
+- contents:
+  - htr_change_freq
+  - htr_seasonal_frequency
+
+- title: Spatial Processing
+- contents:
+  - htr_regrid_esm
+  - htr_integrate_levels
+  - htr_show_levels
+
+- title: Statistical Analysis
+- contents:
+  - htr_calc_mean
+  - htr_calc_anomalies
+  - htr_create_ensemble
+
+- title: Utility Functions
+- contents:
+  - htr_make_folder

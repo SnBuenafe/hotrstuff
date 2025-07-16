@@ -1,22 +1,69 @@
-#' Merge Files
+#' Merge climate model files into continuous time series
 #'
-#' Merge files according to model, variable, frequency, scenario/experiment
+#' This function merges multiple NetCDF files from the same climate model, variable,
+#' frequency, scenario, and variant into single continuous time series files using
+#' CDO (Climate Data Operators). This is essential for creating uninterrupted time
+#' series from climate model outputs that are often split across multiple files.
+#'
+#' @details
+#' Climate model data is typically provided as multiple files covering different
+#' time periods. This function combines these files into continuous time series
+#' using the CDO `mergetime` operator, which concatenates files along the time dimension.
+#'
+#' The function:
+#' 1. Extracts metadata (variable, frequency, scenario, model, variant) from all files
+#' 2. Groups files by their metadata combinations
+#' 3. Filters files based on the specified year range to avoid out-of-scope data
+#' 4. Merges files for each group using `cdo -L -selname,'variable' -mergetime`
+#' 5. Creates output filenames with "_merged_" and the full time range
+#'
+#' The CDO command used is:
+#' `cdo -L -selname,'variable' -mergetime input_files output_file`
+#'
+#' Where:
+#' - `-L` enables netCDF4 compression
+#' - `selname` ensures only the specified variable is retained
+#' - `mergetime` concatenates files along the time dimension
 #'
 #' @author Dave Schoeman and Tin Buenafe
 #'
 #' @inheritParams htr_slice_period
+#' @param year_start Numeric. Earliest year to include in the merged files. Files
+#'   ending before this year (for historical data) will be excluded.
+#' @param year_end Numeric. Latest year to include in the merged files. Files
+#'   starting after this year (for projection data) will be excluded.
+#'
+#' @return
+#' No return value. The function creates merged time series files in the specified
+#' output directory with filenames following the pattern:
+#' `variable_frequency_model_scenario_variant_merged_YYYYMMDD-YYYYMMDD.nc`
+#'
+#' @note
+#' - Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+#' - Input files must follow CMIP6 naming conventions for proper metadata extraction
+#' - Files are only merged if they don't already exist in the output directory
+#' - Uses parallel processing with (number of CPU cores - 2) workers
+#' - The `-L` flag enables netCDF4 compression for smaller output files
+#' - Automatically handles different time ranges for historical vs. projection scenarios
+#'
+#' @references
+#' CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+#' CDO mergetime operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=102
+#' CDO selname operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=126
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#' # Get a path to a temporary directory
+#' temp_dir <- tempdir()
 #'
 #' htr_merge_files(
 #'   hpc = NA,
-#'   indir = file.path(base_dir, "data", "raw", "tos"), # input directory
-#'   outdir = file.path(base_dir, "data", "proc", "merged", "tos"), # output directory
-#'   year_start = 1985, # earliest year across all the scenarios considered
-#'   year_end = 2100 # latest year across all the scenarios considered
+#'   indir = system.file("extdata", package = "hotrstuff"), # input directory
+#'   outdir = file.path(temp_dir, "merged"), # output directory
+#'   year_start = 1990, # earliest year across all the scenarios considered
+#'   year_end = 2014 # latest year across all the scenarios considered
 #' )
 #' }
 htr_merge_files <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"

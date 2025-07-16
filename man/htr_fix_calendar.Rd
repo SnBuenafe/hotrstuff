@@ -2,29 +2,74 @@
 % Please edit documentation in R/htr_fix_calendar.R
 \name{htr_fix_calendar}
 \alias{htr_fix_calendar}
-\title{Fix calendars (leap years)}
+\title{Fix calendar systems by standardizing to 365-day calendar}
 \usage{
 htr_fix_calendar(hpc = NA, file = NA, indir)
 }
 \arguments{
-\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NA}: Standard processing mode
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
 
-\item{file}{For when using the "array" option in the HPC, the file name needs to be specified}
+\item{file}{Character string or NA. Specific file to process when \code{hpc = "array"}.
+Not used in other modes.}
 
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing NetCDF files that need calendar
+standardization. Files should be climate model outputs with time dimensions.}
+}
+\value{
+No return value. The function modifies files in-place, replacing original files
+with calendar-standardized versions. Progress messages are printed to the console
+indicating which files had leap days removed.
 }
 \description{
-Fix calendars (leap years)
+This function standardizes climate model data to use a consistent 365-day calendar
+system by removing leap days (February 29th) and setting the calendar attribute.
+This is essential for consistent temporal analysis across different climate models
+that may use different calendar systems.
+}
+\details{
+Climate models use various calendar systems (Gregorian, 365-day, 360-day, etc.),
+which can cause issues when comparing or combining data from different models.
+This function standardizes all data to a 365-day calendar using CDO operations.
+
+The function:
+\enumerate{
+\item Checks if files contain leap days by examining if the number of time steps is divisible by 365
+\item For daily data with leap days: Uses \verb{cdo -setcalendar,365_day -delete,month=2,day=29} to remove February 29th
+\item For data without leap days: Uses \verb{cdo setcalendar,365_day} to set the calendar attribute
+\item Replaces original files with the calendar-corrected versions
+}
+
+The process creates temporary files during processing to avoid data corruption.
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item \strong{WARNING}: This function modifies files in-place. Ensure you have backups of original data
+\item Only processes daily frequency data for leap day removal (detected by "\emph{day}" in frequency)
+\item Uses parallel processing when \code{hpc} is not set to "array"
+\item Creates temporary files during processing which are automatically cleaned up
+\item Prints informative messages about which files are being processed
+}
 }
 \examples{
 \dontrun{
-
 htr_fix_calendar(
   hpc = NA,
   file = NA,
-  indir = file.path(base_dir, "data", "merged"), # input directory
+  indir = file.path(base_dir, "data", "merged") # input directory
 )
 }
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO setcalendar operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=142
+CDO delete operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=60
+CMIP6 calendar conventions: https://pcmdi.llnl.gov/CMIP6/Guide/dataUsers.html
 }
 \author{
 Dave Schoeman and Tin Buenafe

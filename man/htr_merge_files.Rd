@@ -2,35 +2,92 @@
 % Please edit documentation in R/htr_merge_files.R
 \name{htr_merge_files}
 \alias{htr_merge_files}
-\title{Merge Files}
+\title{Merge climate model files into continuous time series}
 \usage{
 htr_merge_files(hpc = NA, indir, outdir, year_start, year_end)
 }
 \arguments{
-\item{hpc}{Indicates whether the user is working in a HPC (High Performance Computing) facility}
+\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NA}: Standard processing mode
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
 
-\item{indir}{Directory where input files are located}
+\item{indir}{Character string. Directory containing merged NetCDF files to be
+time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
-\item{outdir}{Directory where output files will be saved}
+\item{outdir}{Character string. Directory where time-sliced files will be saved.}
 
-\item{year_start}{Starting year}
+\item{year_start}{Numeric. Earliest year to include in the merged files. Files
+ending before this year (for historical data) will be excluded.}
 
-\item{year_end}{Ending year}
+\item{year_end}{Numeric. Latest year to include in the merged files. Files
+starting after this year (for projection data) will be excluded.}
+}
+\value{
+No return value. The function creates merged time series files in the specified
+output directory with filenames following the pattern:
+\code{variable_frequency_model_scenario_variant_merged_YYYYMMDD-YYYYMMDD.nc}
 }
 \description{
-Merge files according to model, variable, frequency, scenario/experiment
+This function merges multiple NetCDF files from the same climate model, variable,
+frequency, scenario, and variant into single continuous time series files using
+CDO (Climate Data Operators). This is essential for creating uninterrupted time
+series from climate model outputs that are often split across multiple files.
+}
+\details{
+Climate model data is typically provided as multiple files covering different
+time periods. This function combines these files into continuous time series
+using the CDO \code{mergetime} operator, which concatenates files along the time dimension.
+
+The function:
+\enumerate{
+\item Extracts metadata (variable, frequency, scenario, model, variant) from all files
+\item Groups files by their metadata combinations
+\item Filters files based on the specified year range to avoid out-of-scope data
+\item Merges files for each group using \verb{cdo -L -selname,'variable' -mergetime}
+\item Creates output filenames with "\emph{merged}" and the full time range
+}
+
+The CDO command used is:
+\verb{cdo -L -selname,'variable' -mergetime input_files output_file}
+
+Where:
+\itemize{
+\item \code{-L} enables netCDF4 compression
+\item \code{selname} ensures only the specified variable is retained
+\item \code{mergetime} concatenates files along the time dimension
+}
+}
+\note{
+\itemize{
+\item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
+\item Input files must follow CMIP6 naming conventions for proper metadata extraction
+\item Files are only merged if they don't already exist in the output directory
+\item Uses parallel processing with (number of CPU cores - 2) workers
+\item The \code{-L} flag enables netCDF4 compression for smaller output files
+\item Automatically handles different time ranges for historical vs. projection scenarios
+}
 }
 \examples{
 \dontrun{
+# Get a path to a temporary directory
+temp_dir <- tempdir()
 
 htr_merge_files(
   hpc = NA,
-  indir = file.path(base_dir, "data", "raw", "tos"), # input directory
-  outdir = file.path(base_dir, "data", "proc", "merged", "tos"), # output directory
-  year_start = 1985, # earliest year across all the scenarios considered
-  year_end = 2100 # latest year across all the scenarios considered
+  indir = system.file("extdata", package = "hotrstuff"), # input directory
+  outdir = file.path(temp_dir, "merged"), # output directory
+  year_start = 1990, # earliest year across all the scenarios considered
+  year_end = 2014 # latest year across all the scenarios considered
 )
 }
+}
+\references{
+CDO User Guide: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+CDO mergetime operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=102
+CDO selname operator: https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf#page=126
 }
 \author{
 Dave Schoeman and Tin Buenafe
