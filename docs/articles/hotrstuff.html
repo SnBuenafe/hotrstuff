@@ -21,7 +21,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-dark" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">hotrstuff</a>
 
@@ -34,7 +34,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="active nav-item"><a class="nav-link" href="../articles/hotrstuff.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/hotrstuff.html">Get Started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -63,50 +63,49 @@
 
     
     
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>The aim of this tutorial is to provide a short introduction to the
+<em>hotrstuff</em> R package. It is also intended to help users
+familiarize themselves with how Earth System Models (ESM) outputs from
+the Coupled Model Intercomparison Project (CMIP) are structured.
+<em>hotrstuff</em> helps with downloading, wrangling, and processing ESM
+outputs, to make more conscious decisions when dealing with ESM outputs.
+Throughout this tutorial, we will also talk about some best practices
+when handling ESM outputs (<a href="https://doi.org/10.1016/j.tree.2023.04.005" class="external-link"><span class="citation">Schoeman et al. (2023)</span></a>).</p>
+</div>
+<div class="section level2">
+<h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
+</h2>
+<p>To illustrate the functionality of the different functions, we are
+primarily going to use surface temperature data (<code>tos</code> is
+surface temperature’s official code) from three different ESMs (…………)
+across three different emission scenarios (SSP1-2.6, SSP2-4.5,
+SSP3-7.0). ESM outputs can be downloaded through the <a href="https://esgf.nci.org.au/search" class="external-link">Earth System Grid Federation</a>.
+To learn more about the different CMIP6 variables and vocabulary, read
+<a href="https://wcrp-cmip.org/cmip-data-access/" class="external-link">documentation on
+CMIP</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/SnBuenafe/hotrstuff" class="external-link">hotrstuff</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># load packages</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/SnBuenafe/hotrstuff" class="external-link">hotrstuff</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">variable</span> <span class="op">=</span> <span class="st">"tos"</span> <span class="co"># Variable chosen is sea surface salinity</span></span></code></pre></div>
-<p>This vignette shows how you can download, wrangle, and process ESM
-data to calculate climate metrics. The idea is that the functions are
-independent of each other and can still perform their purpose without
-having to follow the entire workflow detailed below, from start to
-finish.</p>
-<p>This code works for both monthly (<code>mon</code>) and daily
-(<code>day</code>) climate data.</p>
-<p>I would recommend creating a <code>data</code> folder, with the
-following basic structure:</p>
-<ul>
-<li>
-<code>data/raw/</code>: raw, untouched data</li>
-<li>
-<code>data/raw/wget</code>: downloaded <code>wget</code>
-scripts</li>
-<li>
-<code>data/raw/tos</code>: raw ESM data (e.g., tos - sea surface
-temperature)</li>
-<li>
-<code>data/proc/</code>: processed ESM data</li>
-<li>
-<code>data/proc/merged</code>: merged files per model - 1 model per
-model/variable/scenario/frequency combination</li>
-<li>
-<code>data/proc/sliced</code>: sliced files depending on the
-required time period</li>
-<li>
-<code>data/proc/yearly</code>: yearly data (after converting monthly
-frequency to yearly frequency)</li>
-<li>
-<code>data/proc/regridded</code>: regridded data, standardizing
-grids of data</li>
-<li>
-<code>data/proc/ensemble</code>: ensemble mean/median for each
-variable/scenario/frequency combination</li>
-</ul>
-<p>We will follow this folder structure throughout the vignette. It will
-still work with a different folder structure, just make sure you’re
-inputting the right paths.</p>
+<span><span class="co"># define variable</span></span>
+<span><span class="va">var</span> <span class="op">&lt;-</span> <span class="st">"tos"</span></span></code></pre></div>
+<!-- This code works for both monthly (`mon`) and daily (`day`) climate data. -->
+<!-- I would recommend creating a `data` folder, with the following basic structure: -->
+<!-- - `data/raw/`: raw, untouched data -->
+<!-- - `data/raw/wget`: downloaded `wget` scripts -->
+<!-- - `data/raw/tos`: raw ESM data (e.g., tos - sea surface temperature) -->
+<!-- - `data/proc/`: processed ESM data -->
+<!-- - `data/proc/merged`: merged files per model - 1 model per model/variable/scenario/frequency combination -->
+<!-- - `data/proc/sliced`: sliced files depending on the required time period -->
+<!-- - `data/proc/yearly`: yearly data (after converting monthly frequency to yearly frequency) -->
+<!-- - `data/proc/regridded`: regridded data, standardizing grids of data -->
+<!-- - `data/proc/ensemble`: ensemble mean/median for each variable/scenario/frequency combination -->
+<!-- We will follow this folder structure throughout the vignette. It will still work with a different folder structure, just make sure you're inputting the right paths. -->
+</div>
 <div class="section level2">
 <h2 id="downloading-esm-outputs">Downloading ESM outputs<a class="anchor" aria-label="anchor" href="#downloading-esm-outputs"></a>
 </h2>
@@ -254,6 +253,19 @@ need to input a list of the model names as a vector in the
 <div class="section level2">
 <h2 id="create-baseline-anomalies">Create baseline anomalies<a class="anchor" aria-label="anchor" href="#create-baseline-anomalies"></a>
 </h2>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-dschoeman1" class="csl-entry">
+Schoeman, D. S., A. S. Gupta, C. S. Harrison, J. D. Everett, I.
+Brito-Morales, L. Hannah, L. Bopp, P. R. Roehrdanz, and A. J.
+Richardson. 2023. <span>“Demystifying Global Climate Models for Use in
+the Life Sciences.”</span> <em>Trends in Ecology and Evolution</em> 38
+(9): P843–858. <a href="https://doi.org/10.1016/j.tree.2023.04.005" class="external-link">https://doi.org/10.1016/j.tree.2023.04.005</a>.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

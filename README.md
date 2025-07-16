@@ -12,11 +12,12 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![Windows](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Windows.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/Windows.yaml)
 
 <!--[![Codecov test coverage](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/SnBuenafe/hotrstuff/actions/workflows/test-coverage.yaml) -->
+
 <!-- badges: end -->
 
-The goal of `hotrstuff` is to facilitate the rapid download, wrangling
-and processing of Earth System Model (ESM) output from the Coupled Model
-Intercomparison Project (CMIP).
+`hotrstuff` facilitates the rapid download, wrangling and processing of
+Earth System Model (ESM) output from the Coupled Model Intercomparison
+Project (CMIP).
 
 To get started, you will need to download the wget scripts from your
 chosen CMIP6 repository. We use: <https://aims2.llnl.gov/search>. From
@@ -26,7 +27,8 @@ there `hotrstuff` makes it easy to:
 - Merge files,  
 - Regrid to chosen resolution,  
 - Slice to required timeframe,  
-- Crop to requested spatial area,  
+- Change frequency of data (e.g., changing from monthly to yearly),  
+- Calculate the vertical mean for depth-resolved ESMs, and  
 - Create mean/median ensembles of variables, scenarios etc.
 
 ## Requirements
@@ -86,6 +88,6 @@ To get started with `hotrstuff`, follow the vignette
 ## Citation
 
 Buenafe K, Schoeman D, Everett J (2024). hotrstuff: Facilitate the rapid
-download, wrangling and processing of Earth System Model (ESM) output
-from the Coupled Model Intercomparison Project (CMIP).. R package
-version 0.0.1, <https://github.com/SnBuenafe/hotrstuff>.
+download, wrangling and processing of Earth System Model (ESM) outputs
+from the Coupled Model Intercomparison Project (CMIP). R package version
+0.0.2, <https://github.com/SnBuenafe/hotrstuff>.

@@ -1,6 +1,6 @@
-pandoc: 3.6.3
+pandoc: '3.4'
 pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   hotrstuff: hotrstuff.html
-last_built: 2025-06-26T04:51Z
+last_built: 2025-07-16T05:17Z
