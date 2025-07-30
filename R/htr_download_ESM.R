@@ -12,7 +12,7 @@
 #' The process involves:
 #' 1. Finding all wget script files in the input directory
 #' 2. For each script, changing to the output directory
-#' 3. Executing the wget script with the `-s` flag (silent mode)
+#' 3. Executing the wget script with the `-q` flag (quiet mode)
 #' 4. Restoring the original working directory
 #'
 #' All wget scripts are processed in parallel using multiple workers for efficient
@@ -26,6 +26,16 @@
 #'   remote repositories (e.g., ESGF data nodes).
 #' @param outdir Character string. Directory where the downloaded NetCDF files will
 #'   be saved. The function will change to this directory before executing wget scripts.
+#' @param quiet Logical. If `TRUE` (default), the download progress is shown.
+#'   If `FALSE`, the download progress is not shown.
+#' @param security Logical. If `FALSE` (default), skips security checks.
+#' Note that this option will only work if the data is not secured at all. If `TRUE`,
+#' user must input a character string in either the `openid` argument or
+#' in the `certificate` argument.
+#' @param openid Character string. String of the OpenID that can be used
+#' to download secure files.
+#' @param certificate Character string. String of the certificate that can be used
+#' to download secure files.
 #'
 #' @return
 #' No return value. The function downloads NetCDF files to the specified output
@@ -55,7 +65,11 @@
 #' }
 htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
                              indir, # where wget files are located
-                             outdir) { # where .nc files should be downloaded
+                             outdir, # where .nc files should be downloaded
+                             quiet = TRUE,
+                             security = FALSE,
+                             openid = NA,
+                             certificate = NA) {
 
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
@@ -73,7 +87,25 @@ htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are 
 
   wget_files <- function(script) {
     setwd(outdir)
-    system(paste0("bash ", script, " -s")) # Change the path to where you want the data stored, then run wget from there
+
+    if(isTRUE(quiet)) {
+      system_code <- paste0("bash ", script, " -q")
+    } else {
+      system_code <- paste0("bash ", script)
+    }
+
+    if(isFALSE(security)) {
+      system_code <- paste0(system_code, " -s")
+    } else if(isTRUE(security) && length(openid) > 0) {
+      system_code <- paste0(system_code, " -o ", openid)
+    } else if(isTRUE(security) && length(certificate) > 0) {
+      system_code <- paste0(system_code, " -c", certificate)
+    } else {
+      cat("You need to input your openid or a certificate to download a secure file.")
+    }
+
+    system(system_code)
+
     setwd(pth) # change back the working directory
   }
 

@@ -1,3 +1,5 @@
-## code to prepare `DATASET` dataset goes here
+## DESCRIPTION: Code to prepare data
+
+
 
 usethis::use_data(DATASET, overwrite = TRUE)

@@ -4,7 +4,15 @@
 \alias{htr_download_ESM}
 \title{Download Earth System Model (ESM) data using wget scripts}
 \usage{
-htr_download_ESM(hpc = NA, indir, outdir)
+htr_download_ESM(
+  hpc = NA,
+  indir,
+  outdir,
+  quiet = TRUE,
+  security = FALSE,
+  openid = NA,
+  certificate = NA
+)
 }
 \arguments{
 \item{hpc}{Character string or NA. Indicates High Performance Computing mode:
@@ -20,6 +28,20 @@ remote repositories (e.g., ESGF data nodes).}
 
 \item{outdir}{Character string. Directory where the downloaded NetCDF files will
 be saved. The function will change to this directory before executing wget scripts.}
+
+\item{quiet}{Logical. If \code{TRUE} (default), the download progress is shown.
+If \code{FALSE}, the download progress is not shown.}
+
+\item{security}{Logical. If \code{FALSE} (default), skips security checks.
+Note that this option will only work if the data is not secured at all. If \code{TRUE},
+user must input a character string in either the \code{openid} argument or
+in the \code{certificate} argument.}
+
+\item{openid}{Character string. String of the OpenID that can be used
+to download secure files.}
+
+\item{certificate}{Character string. String of the certificate that can be used
+to download secure files.}
 }
 \value{
 No return value. The function downloads NetCDF files to the specified output
@@ -39,7 +61,7 @@ The process involves:
 \enumerate{
 \item Finding all wget script files in the input directory
 \item For each script, changing to the output directory
-\item Executing the wget script with the \code{-s} flag (silent mode)
+\item Executing the wget script with the \code{-q} flag (quiet mode)
 \item Restoring the original working directory
 }
 

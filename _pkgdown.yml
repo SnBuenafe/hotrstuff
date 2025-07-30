@@ -45,6 +45,7 @@ reference:
 - title: Spatial Processing
 - contents:
   - htr_regrid_esm
+  - htr_fill_missing
 
 - title: Depth-resolved Processing
 - contents:
