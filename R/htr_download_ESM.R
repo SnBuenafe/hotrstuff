@@ -95,7 +95,7 @@ htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are 
     }
 
     if(isFALSE(security)) {
-      system_code <- paste0(system_code, " -s")
+      system_code <- paste0(system_code, " -S")
     } else if(isTRUE(security) && length(openid) > 0) {
       system_code <- paste0(system_code, " -o ", openid)
     } else if(isTRUE(security) && length(certificate) > 0) {
