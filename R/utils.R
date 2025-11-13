@@ -132,7 +132,7 @@ htr_make_folder <- function(folder) {
 #' The function creates a global raster covering -180 to 180 degrees longitude
 #' and -90 to 90 degrees latitude at the specified resolution. All cells are
 #' set to value 1, and the raster is converted to netCDF4 format using
-#' [`htr_mask2netCDF4()`] for compatibility with CDO regridding operations.
+#' `htr_mask2netCDF4()` for compatibility with CDO regridding operations.
 #'
 #' @author David Schoeman and Tin Buenafe
 #'
@@ -236,7 +236,7 @@ htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
 #'
 #' @details
 #' The function processes all files in a directory, extracts CMIP6 metadata
-#' using [`htr_get_CMIP6_bits()`], and returns unique combinations of the
+#' using `htr_get_CMIP6_bits()`, and returns unique combinations of the
 #' requested metadata elements. This is essential for organizing batch
 #' processing operations where files need to be grouped by their characteristics.
 #'
