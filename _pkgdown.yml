@@ -1,10 +1,29 @@
 url: ~
+
 template:
   bootstrap: 5
+  bslib:
+    bootswatch: yeti
+    navbar-brand-font-size: 2rem
+    #nav-link-font-size: 1.5rem
+
 development:
   destination:
   version_label: info
   version_tooltip: "The package is in the early stages of development. Use with caution."
+
+navbar:
+  bg: dark
+  structure:
+    left: [home, reference]
+  components:
+    home:
+      text: "Get Started"
+      href: articles/hotrstuff.html
+    reference:
+      text: "Reference"
+      href: reference/index.html
+
 reference:
 
 - title: Data Aquisition
@@ -26,6 +45,10 @@ reference:
 - title: Spatial Processing
 - contents:
   - htr_regrid_esm
+  - htr_fill_missing
+
+- title: Depth-resolved Processing
+- contents:
   - htr_integrate_levels
   - htr_show_levels
 
