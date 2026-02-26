@@ -66,23 +66,21 @@
 #'   layer = "annual"
 #' )
 #' }
-htr_regrid_esm <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
-                           file = NA, # hpc = "array", the input will be the file
-                           indir, # input directory
+htr_regrid_esm <- function(indir, # input directory
                            outdir, # folder to save the regridded ESM
                            cell_res = 0.25, # resolution of blank raster
-                           layer # which layer is being regridded (anomalies, annual, etc.?)
+                           layer, # which layer is being regridded (anomalies, annual, etc.?)
+                           ncores = NULL, # Use all available. Ignored on HPC
+                           hpc = NULL, # if run in the HPC, possible values are "array", "parallel"
+                           file = NA, # hpc = "array", the input will be the file
+                           cdo_flags = "-f nc4c -z zip_1"
 ) {
 
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
 
   # Define workers
-  if(is.na(hpc)) {
-    w <- parallelly::availableCores(method = "system", omit = 2)
-  } else {
-    w <- parallelly::availableCores(method = "Slurm", omit = 2)
-  }
+  w <- htr_workers(ncores, hpc)
 
   base_rast <- htr_make_blankRaster(
     outdir,
@@ -105,17 +103,17 @@ htr_regrid_esm <- function(hpc = NA, # if ran in the HPC, possible values are "a
       stringr::str_replace(basename(anom_file), new_name)
 
     if (bits$Variable == "pr") { # For precipitation, use conservative remapping
-      cdo_code <- paste0("cdo -s -L -remapcon,", base_rast, " ", anom_file, " ", out_file)
+      cdo_code <- paste0("cdo ", cdo_flags, " -s -L -remapcon,", base_rast, " ", anom_file, " ", out_file)
       system(cdo_code)
     } else { # For everything else, use bilinear interpolation, although Bio-ORACLE uses remapdis, so consider changing to that
-      cdo_code <- paste0("cdo -s -L -remapbil,", base_rast, " ", anom_file, " ", out_file)
+      cdo_code <- paste0("cdo ", cdo_flags, " -s -L -remapbil,", base_rast, " ", anom_file, " ", out_file)
       system(cdo_code)
     }
   }
 
   ##############
 
-  if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
+   if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
 
     netCDF <- dir(indir, pattern = file, full.names = TRUE)
 

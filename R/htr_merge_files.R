@@ -66,11 +66,13 @@
 #'   year_end = 2014 # latest year across all the scenarios considered
 #' )
 #' }
-htr_merge_files <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
-                            indir, # where nc files are located
+htr_merge_files <- function(indir, # where nc files are located
                             outdir, # where merged files should be saved
                             year_start, # start year of historical file
-                            year_end # end year of projection file
+                            year_end, # end year of projection file
+                            ncores = NULL, # Use all available. Ignored on HPC
+                            hpc = NULL, # if run in the HPC, possible values are "array", "parallel"
+                            cdo_flags = "-f nc4c -z zip_1"
 ) {
   . <- NULL # Stop devtools::check() complaints about NSE
 
@@ -78,11 +80,7 @@ htr_merge_files <- function(hpc = NA, # if ran in the HPC, possible values are "
   htr_make_folder(outdir)
 
   # Define workers
-  if(is.na(hpc)) {
-    w <- parallelly::availableCores(methods = "system", omit = 2)
-  } else {
-    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
-  }
+  w <- htr_workers(ncores, hpc)
 
   l <- htr_get_meta(indir, string = c("Variable", "Frequency", "Scenario", "Model", "Variant"))
 
@@ -130,7 +128,8 @@ htr_merge_files <- function(hpc = NA, # if ran in the HPC, possible values are "
         "_", vt, "_merged_", y1, "-", y2, ".nc"
       )
       if (!file.exists(out_file)) {
-        cdo_code <- paste0("cdo -L -selname,", "'", v, "' -mergetime ", paste0(files, collapse = " "), " ", out_file)
+
+        cdo_code <- paste0("cdo ", cdo_flags, " -L -selname,", "'", v, "' -mergetime ", paste0(files, collapse = " "), " ", out_file)
         system(cdo_code)
 
         print(paste0(v, "_", fr, "_", s, "_", m, "_", vt))

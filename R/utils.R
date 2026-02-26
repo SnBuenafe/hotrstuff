@@ -351,3 +351,30 @@ htr_get_CMIP6_bits <- function(file_name) {
   )
   return(output)
 }
+
+
+#' Determine number of workers
+#'
+#' @param ncores
+#' @param hpc
+#'
+#' @returns
+#'
+#' @noRd
+htr_workers <- function(ncores, hpc){
+
+  # Define workers
+  if(is.null(hpc)) {
+    if (is.null(ncores)){
+      w <- parallelly::availableCores(methods = "system", omit = 2)
+    } else {
+      w = ncores}
+  } else {
+    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
+  }
+
+  print(paste0("Using ", w, " cores for processing"))
+
+  return(w)
+  }
+

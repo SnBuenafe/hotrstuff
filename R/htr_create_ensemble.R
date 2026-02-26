@@ -64,8 +64,7 @@
 #'   mean = TRUE
 #' )
 #' }
-htr_create_ensemble <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
-                                indir,
+htr_create_ensemble <- function(indir,
                                 outdir,
                                 model_list,
                                 variable = "tos",
@@ -73,18 +72,17 @@ htr_create_ensemble <- function(hpc = NA, # if ran in the HPC, possible values a
                                 scenario = "historical",
                                 season = "", # default is no season
                                 domain = "", # default is no domain
-                                mean = TRUE # if false, use median
+                                mean = TRUE, # if false, use median
+                                ncores = NULL, # Use all available. Ignored on HPC
+                                hpc = NULL, # if run in the HPC, possible values are "array", "parallel"
+                                cdo_flags = "-f nc4c -z zip_1"
 ) {
 
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
 
   # Define workers
-  if(is.na(hpc)) {
-    w <- parallelly::availableCores(methods = "system", omit = 2)
-  } else {
-    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
-  }
+  w <- htr_workers(ncores, hpc)
 
   ##############
 
@@ -122,11 +120,11 @@ htr_create_ensemble <- function(hpc = NA, # if ran in the HPC, possible values a
 
   if (mean == TRUE) {
 
-    cdo_code <- paste0("cdo -L -z zip -ensmean ", paste0(files, collapse = " "), " ", out_name)
+    cdo_code <- paste0("cdo ", cdo_flags, " -L -ensmean ", paste0(files, collapse = " "), " ", out_name)
 
   } else if (mean == FALSE) { # Calculate the median
 
-    cdo_code <- paste0("cdo -L -z zip -ensmedian ", paste0(files, collapse = " "), " ", out_name)
+    cdo_code <- paste0("cdo ", cdo_flags, " -L -ensmedian ", paste0(files, collapse = " "), " ", out_name)
 
   } else {
 
