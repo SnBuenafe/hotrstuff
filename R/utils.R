@@ -199,7 +199,7 @@ htr_make_blankRaster <- function(out_dir, cell_res # resolution of the cell
 #' - Uses CMIP6 filename parsing for metadata extraction
 #'
 #' @noRd
-htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
+htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite, cdo_flags = "-f nc4c -z zip_1") {
   . <- NULL # Stop devtools::check() complaints about NSE
 
   bits <- htr_get_CMIP6_bits(nc_file)
@@ -214,7 +214,7 @@ htr_get_Years <- function(nc_file, yr1, yr2, infold, outfold, overwrite) {
       unlist() %>%
       paste0(., "_", yr1, "0101-", yr2, "1231.nc")
 
-    system(paste0("cdo selyear,", yr1, "/", yr2, " ", infold, "/", nc_file, " ", outfold, "/", new_name))
+    system(paste0("cdo ", cdo_flags, " selyear,", yr1, "/", yr2, " ", infold, "/", nc_file, " ", outfold, "/", new_name))
     # file.remove(paste0(infold, "/", nc_file))
   } else {
     cat("Nothing to do!")
@@ -355,10 +355,15 @@ htr_get_CMIP6_bits <- function(file_name) {
 
 #' Determine number of workers
 #'
-#' @param ncores
-#' @param hpc
+#' Determines the number of parallel workers to use based on the computing environment
+#' and user preferences.
 #'
-#' @returns
+#' @param ncores Integer or NULL. Number of CPU cores to use. If NULL, uses all
+#'   available cores minus 2.
+#' @param hpc Character string or NULL. HPC mode indicator. If NULL, uses system
+#'   cores; otherwise uses Slurm-detected cores.
+#'
+#' @returns Integer. The number of workers to use for parallel processing.
 #'
 #' @noRd
 htr_workers <- function(ncores, hpc){
@@ -378,3 +383,65 @@ htr_workers <- function(ncores, hpc){
   return(w)
   }
 
+
+#' List files from directory with warning if none found
+#'
+#' A helper function that lists files from a directory with optional pattern matching
+#' and provides a warning message if no files are found.
+#'
+#' @param indir Character string. Directory path to search for files.
+#' @param pattern Character string or NULL. Optional regex pattern to filter files.
+#'   If NULL, returns all files in the directory.
+#' @param full.names Logical. If TRUE (default), returns full file paths.
+#'   If FALSE, returns only file names.
+#'
+#' @returns Character vector of file paths, or NULL if no files found (with warning).
+#'
+#' @noRd
+htr_list_files <- function(indir, pattern = NULL, full.names = TRUE) {
+
+  if (!dir.exists(indir)) {
+    warning("Directory does not exist: ", indir)
+    return(NULL)
+  }
+
+  files <- dir(indir, pattern = pattern, full.names = full.names)
+
+  if (length(files) == 0) {
+    if (is.null(pattern)) {
+      warning("No files found in: ", indir)
+    } else {
+      warning("No files matching pattern '", pattern, "' found in: ", indir)
+    }
+    return(NULL)
+  }
+
+  return(files)
+}
+
+
+#' Run CDO command with file existence check and messaging
+#'
+#' Internal helper function that wraps CDO system calls with consistent
+#' file existence checking and user messaging. If the output file already
+#' exists and overwrite is FALSE, the command is skipped with a message.
+#'
+#' @param cdo_code Character. The complete CDO command to execute.
+#' @param out_file Character. Path to the output file that will be created.
+#' @param overwrite Logical. If FALSE (default), skip if file exists.
+#'   If TRUE, run the command even if the file already exists.
+#'
+#' @return Invisible NULL. Called for side effects (running CDO command).
+#'
+#' @noRd
+htr_run_cdo <- function(cdo_code, out_file, overwrite = FALSE) {
+
+  if (file.exists(out_file) && !overwrite) {
+    message("Skipped (exists): ", basename(out_file), " - Set overwrite = TRUE to regenerate")
+    return(invisible(NULL))
+  }
+
+  system(cdo_code)
+  message("Written: ", basename(out_file))
+  return(invisible(NULL))
+}

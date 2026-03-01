@@ -4,7 +4,7 @@
 \alias{htr_shift_years}
 \title{Shift time coordinates in climate model data}
 \usage{
-htr_shift_years(indir, outdir, adjust_value)
+htr_shift_years(indir, outdir, adjust_value, overwrite = FALSE)
 }
 \arguments{
 \item{indir}{Character string. Directory containing input NetCDF files with

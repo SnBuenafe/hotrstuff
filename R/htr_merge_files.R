@@ -32,6 +32,8 @@
 #'   ending before this year (for historical data) will be excluded.
 #' @param year_end Numeric. Latest year to include in the merged files. Files
 #'   starting after this year (for projection data) will be excluded.
+#' @param overwrite Logical. If `FALSE` (default), skips files that already exist
+#'   in the output directory. If `TRUE`, regenerates files even if they exist.
 #'
 #' @return
 #' No return value. The function creates merged time series files in the specified
@@ -59,7 +61,6 @@
 #' temp_dir <- tempdir()
 #'
 #' htr_merge_files(
-#'   hpc = NA,
 #'   indir = system.file("extdata", package = "hotrstuff"), # input directory
 #'   outdir = file.path(temp_dir, "merged"), # output directory
 #'   year_start = 1990, # earliest year across all the scenarios considered
@@ -70,6 +71,7 @@ htr_merge_files <- function(indir, # where nc files are located
                             outdir, # where merged files should be saved
                             year_start, # start year of historical file
                             year_end, # end year of projection file
+                            overwrite = FALSE, # if TRUE, overwrite existing files
                             ncores = NULL, # Use all available. Ignored on HPC
                             hpc = NULL, # if run in the HPC, possible values are "array", "parallel"
                             cdo_flags = "-f nc4c -z zip_1"
@@ -78,6 +80,10 @@ htr_merge_files <- function(indir, # where nc files are located
 
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
+
+  # Check for files in input directory
+  all_files <- htr_list_files(indir)
+  if (is.null(all_files)) return(invisible(NULL))
 
   # Define workers
   w <- htr_workers(ncores, hpc)
@@ -127,13 +133,9 @@ htr_merge_files <- function(indir, # where nc files are located
         outdir, "/", v, "_", fr, "_", m, "_", s,
         "_", vt, "_merged_", y1, "-", y2, ".nc"
       )
-      if (!file.exists(out_file)) {
 
-        cdo_code <- paste0("cdo ", cdo_flags, " -L -selname,", "'", v, "' -mergetime ", paste0(files, collapse = " "), " ", out_file)
-        system(cdo_code)
-
-        print(paste0(v, "_", fr, "_", s, "_", m, "_", vt))
-      }
+      cdo_code <- paste0("cdo ", cdo_flags, " -L -selname,", "'", v, "' -mergetime ", paste0(files, collapse = " "), " ", out_file)
+      htr_run_cdo(cdo_code, out_file, overwrite)
     }
   }
 

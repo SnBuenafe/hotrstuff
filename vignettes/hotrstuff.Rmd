@@ -120,9 +120,9 @@ I created two functions: i) changes frequency to monthly (`monthly_frequency()`)
 
 ```{r monthly, eval = FALSE}
 # htr_change_freq(
-#   freq = "monthly",
 #   indir = file.path(base_dir, "data", "proc", "sliced", variable), # input directory
-#   outdir = file.path(base_dir, "data", "proc", "yearly", variable)
+#   outdir = file.path(base_dir, "data", "proc", "monthly", variable), # output directory
+#   freq = "monthly"
 # )
 ```
 
@@ -130,9 +130,9 @@ Uncomment the code above if you're using daily data and changing it to a monthly
 
 ```{r yearly}
 # htr_change_freq(
-#   freq = "yearly",
 #   indir = file.path(base_dir, "data", "proc", "sliced", variable), # input directory
-#   outdir = file.path(base_dir, "data", "proc", "yearly", variable)
+#   outdir = file.path(base_dir, "data", "proc", "yearly", variable), # output directory
+#   freq = "yearly"
 # )
 ```
 

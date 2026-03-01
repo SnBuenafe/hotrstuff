@@ -31,6 +31,8 @@
 #'   Must be zero-padded (e.g., "01" not "1").
 #' @param months_name Character string. Descriptive name for the season that will
 #'   be added to output filenames (e.g., "DJF", "JJA", "monsoon", "dry-season").
+#' @param overwrite Logical. If `FALSE` (default), skips files that already exist
+#'   in the output directory. If `TRUE`, regenerates files even if they exist.
 #'
 #' @return
 #' No return value. The function creates seasonal files in the specified output
@@ -56,8 +58,6 @@
 #' \dontrun{
 #' # Create DJF (winter) seasonal data
 #' htr_seasonal_frequency(
-#'   hpc = NA,
-#'   file = NA,
 #'   indir = here("data", "proc", "sliced", "omip", variable),
 #'   tempdir = here("data", "temporary"),
 #'   outdir = here("data", "proc", "seasonal", "omip", variable),
@@ -67,8 +67,6 @@
 #'
 #' # Create custom monsoon season
 #' htr_seasonal_frequency(
-#'   hpc = NA,
-#'   file = NA,
 #'   indir = here("data", "proc", "sliced", "omip", variable),
 #'   tempdir = here("data", "temporary"),
 #'   outdir = here("data", "proc", "seasonal", "omip", variable),
@@ -76,13 +74,16 @@
 #'   months_name = "monsoon"
 #' )
 #' }
-htr_seasonal_frequency <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
-                                   file = NA, # hpc = "array", the input will be the file
-                                   indir,
+htr_seasonal_frequency <- function(indir,
                                    tempdir,
                                    outdir,
                                    months, # define season (in numbered format)
-                                   months_name # define season name for the filename's suffix
+                                   months_name, # define season name for the filename's suffix
+                                   overwrite = FALSE, # if TRUE, overwrite existing files
+                                   ncores = NULL, # Use all available. Ignored on HPC
+                                   hpc = NULL, # if run in the HPC, possible values are "array", "parallel"
+                                   file = NULL, # hpc = "array", the input will be the file
+                                   cdo_flags = "-f nc4c -z zip_1"
 ) {
 
   # Create output folder if it doesn't exist
@@ -92,15 +93,11 @@ htr_seasonal_frequency <- function(hpc = NA, # if ran in the HPC, possible value
   htr_make_folder(tempdir)
 
   # Define workers
-  if(is.na(hpc)) {
-    w <- parallelly::availableCores(method = "system", omit = 2)
-  } else {
-    w <- parallelly::availableCores(method = "Slurm", omit = 2)
-  }
+  w <- htr_workers(ncores, hpc)
 
   ##############
 
-  change_seasons <- function(f) {
+  change_seasons <- function(f, overwrite) {
 
     basename <- f %>%
       basename() %>%
@@ -112,24 +109,27 @@ htr_seasonal_frequency <- function(hpc = NA, # if ran in the HPC, possible value
     out_file <- paste0(outdir, "/", basename)
 
     system(paste0("cdo selmon,", paste0(months, collapse = ","), " ", f, " ", tempdir, "/", basename)) # select only the months that are part of the defined season
-    system(paste0("cdo yearmonmean ", tempdir, "/", basename, " ", out_file)) # take the yearly mean across the predefined seasons
+    cdo_code <- paste0("cdo ", cdo_flags, " yearmonmean ", tempdir, "/", basename, " ", out_file) # take the yearly mean across the predefined seasons
+    htr_run_cdo(cdo_code, out_file, overwrite)
 
   }
 
   ##############
 
-  if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
+  if (isTRUE(hpc %in% "array")) { # For hpc == "array", use the specific files as the starting point
 
-    esm <- dir(indir, pattern = file, full.names = TRUE)
+    esm <- htr_list_files(indir, pattern = file)
+    if (is.null(esm)) return(invisible(NULL))
 
-    change_seasons(esm) # run function
+    change_seasons(esm, overwrite) # run function
 
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
 
-    esms <- dir(indir, pattern = "*.nc", full.names = TRUE)
+    esms <- htr_list_files(indir, pattern = "\\.nc$")
+    if (is.null(esms)) return(invisible(NULL))
 
     future::plan(future::multisession, workers = w)
-    furrr::future_walk(esms, change_seasons)
+    furrr::future_walk(esms, change_seasons, overwrite)
     future::plan(future::sequential)
   }
 

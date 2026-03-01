@@ -58,18 +58,19 @@
 #' @examples
 #' \dontrun{
 #' htr_download_ESM(
-#'   hpc = NA,
 #'   indir = file.path(base_dir, "data", "raw", "wget"), # input directory
 #'   outdir = file.path(base_dir, "data", "raw", "tos") # output directory
 #' )
 #' }
-htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
-                             indir, # where wget files are located
+htr_download_ESM <- function(indir, # where wget files are located
                              outdir, # where .nc files should be downloaded
                              quiet = TRUE,
                              security = FALSE,
-                             openid = NA,
-                             certificate = NA) {
+                             openid = NULL,
+                             certificate = NULL,
+                             ncores = NULL, # Use all available. Ignored on HPC
+                             hpc = NULL # if run in the HPC, possible values are "array", "parallel"
+) {
 
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
@@ -77,11 +78,7 @@ htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are 
   pth <- getwd()
 
   # Define workers
-  if(is.na(hpc)) {
-    w <- parallelly::availableCores(methods = "system", omit = 2)
-  } else {
-    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
-  }
+  w <- htr_workers(ncores, hpc)
 
   ##############
 
@@ -111,7 +108,8 @@ htr_download_ESM <- function(hpc = NA, # if ran in the HPC, possible values are 
 
   ##############
 
-  files <- dir(indir, pattern = "wget", full.names = TRUE)
+  files <- htr_list_files(indir, pattern = "wget")
+  if (is.null(files)) return(invisible(NULL))
 
   future::plan(future::multisession, workers = w)
   furrr::future_walk(files, wget_files)

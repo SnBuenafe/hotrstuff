@@ -21,6 +21,8 @@
 #' @param mndir Character string. The directory where the baseline mean files are
 #'   stored. Files should follow CMIP6 naming conventions with variable, frequency,
 #'   and model information in the filename.
+#' @param overwrite Logical. If `FALSE` (default), skips files that already exist
+#'   in the output directory. If `TRUE`, regenerates files even if they exist.
 #'
 #' @return
 #' No return value. The function creates anomaly files in the specified output
@@ -48,9 +50,20 @@
 #' }
 htr_calc_anomalies <- function(indir, # input directory of the projections
                                mndir, # directory of baseline mean
-                               outdir # where anomalies will be saved
+                               outdir, # where anomalies will be saved
+                               overwrite = FALSE # if TRUE, overwrite existing files
 ) {
   w <- parallel::detectCores() - 2
+
+  # Create output folder if it doesn't exist
+  htr_make_folder(outdir)
+
+  # Check for files in input directories
+  all_files <- htr_list_files(indir)
+  if (is.null(all_files)) return(invisible(NULL))
+
+  all_mn <- htr_list_files(mndir)
+  if (is.null(all_mn)) return(invisible(NULL))
 
   # get metadata from the files in the baseline directory
   x <- htr_get_meta(mndir,
@@ -64,7 +77,7 @@ htr_calc_anomalies <- function(indir, # input directory of the projections
       stringr::str_subset(paste0("(?=.*", v, "_", ")(?=.*", fr, "_", ")(?=.*", m, "_", ")")) # For each combination of variable-frequency-model that we have a baseline mean for, find merged files for all time periods
 
     ##############
-    subtract_mean <- function(f) {
+    subtract_mean <- function(f, overwrite) {
       . <- NULL # Stop devtools::check() complaints about NSE
 
       bits <- basename(f) %>%
@@ -77,11 +90,11 @@ htr_calc_anomalies <- function(indir, # input directory of the projections
         stringr::str_replace("_merged_", "_anomalies_")
 
       cdo_code <- paste0("cdo sub ", f, " ", mn, " ", anom_out)
-      system(cdo_code)
+      htr_run_cdo(cdo_code, anom_out, overwrite)
     }
     ##############
 
-    purrr::walk(files, subtract_mean)
+    purrr::walk(files, subtract_mean, overwrite)
   }
 
   ##############

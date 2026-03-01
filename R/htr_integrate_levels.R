@@ -31,6 +31,8 @@
 #'   `select_levels = TRUE`). Units depend on the model's vertical coordinate system.
 #' @param domain_name Character string. Optional suffix to add to output filenames
 #'   to identify the depth domain (e.g., "surface", "0-100m"). Default is empty string.
+#' @param overwrite Logical. If `FALSE` (default), skips files that already exist
+#'   in the output directory. If `TRUE`, regenerates files even if they exist.
 #'
 #' @return
 #' No return value. The function creates vertically-integrated files in the specified
@@ -72,15 +74,18 @@
 #'   domain_name = "upper100m"
 #' )
 #' }
-htr_integrate_levels <- function(hpc = NA, # if ran in the HPC, possible values are "array", "parallel"
-                                 file = NA, # hpc = "array", the input will be the file
-                                 indir,
+htr_integrate_levels <- function(indir,
                                  tempdir,
                                  outdir,
-                                 select_levels = FALSE, # if NA, then integrate all levels
+                                 select_levels = FALSE, # if FALSE, then integrate all levels
                                  min_level,
                                  max_level,
-                                 domain_name = ""
+                                 domain_name = "",
+                                 overwrite = FALSE, # if TRUE, overwrite existing files
+                                 ncores = NULL, # Use all available. Ignored on HPC
+                                 hpc = NULL, # if run in the HPC, possible values are "array", "parallel"
+                                 file = NULL, # hpc = "array", the input will be the file
+                                 cdo_flags = "-f nc4c -z zip_1"
 ) {
 
   # Create output folder if it doesn't exist
@@ -90,13 +95,9 @@ htr_integrate_levels <- function(hpc = NA, # if ran in the HPC, possible values 
   htr_make_folder(tempdir)
 
   # Define workers
-  if(is.na(hpc)) {
-    w <- parallelly::availableCores(method = "system", omit = 2)
-  } else {
-    w <- parallelly::availableCores(method = "Slurm", omit = 2)
-  }
+  w <- htr_workers(ncores, hpc)
 
-  do_integrate <- function(f) {
+  do_integrate <- function(f, overwrite) {
 
     if(stringr::str_length(domain_name) > 0) {
       outname <- f %>%
@@ -113,27 +114,28 @@ htr_integrate_levels <- function(hpc = NA, # if ran in the HPC, possible values 
 
     if(isTRUE(select_levels)) {
       system(paste0("cdo select,levrange=", min_level, ",", max_level, " ", f, " ", tempdir, "/", basename(f)))
-      system(paste0("cdo vertmean ", tempdir, "/", basename(f), " ", out_file))
+      cdo_code <- paste0("cdo ", cdo_flags, " vertmean ", tempdir, "/", basename(f), " ", out_file)
     } else {
-      system(paste0("cdo vertmean ", f, " ", out_file))
+      cdo_code <- paste0("cdo ", cdo_flags, " vertmean ", f, " ", out_file)
     }
-
-    print(basename(f))
+    htr_run_cdo(cdo_code, out_file, overwrite)
 
   }
 
-  if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
+  if (isTRUE(hpc %in% "array")) { # For hpc == "array", use the specific files as the starting point
 
-    esms <- dir(indir, pattern = file, full.names = TRUE)
+    esms <- htr_list_files(indir, pattern = file)
+    if (is.null(esms)) return(invisible(NULL))
 
-    do_integrate(esms) # run function
+    do_integrate(esms, overwrite) # run function
 
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
 
-    esms <- dir(indir, pattern = "*.nc", full.names = TRUE)
+    esms <- htr_list_files(indir, pattern = "\\.nc$")
+    if (is.null(esms)) return(invisible(NULL))
 
     future::plan(future::multisession, workers = w)
-    furrr::future_walk(esms, do_integrate)
+    furrr::future_walk(esms, do_integrate, overwrite)
     future::plan(future::sequential)
 
   }

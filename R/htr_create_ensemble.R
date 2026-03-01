@@ -32,6 +32,8 @@
 #' @param domain Character string. Optional domain name for depth-resolved models
 #'   (e.g., "surface", "0-100m"). Only files containing this string will be included.
 #'   Default is empty string (no filtering).
+#' @param overwrite Logical. If `FALSE` (default), skips files that already exist
+#'   in the output directory. If `TRUE`, regenerates files even if they exist.
 #'
 #' @return
 #' No return value. The function creates an ensemble file in the specified output
@@ -54,7 +56,6 @@
 #' @examples
 #' \dontrun{
 #' htr_create_ensemble(
-#'   hpc = NA,
 #'   indir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
 #'   outdir = file.path(base_dir, "data", "proc", "ensemble", "mean", "tos"),
 #'   model_list = c("ACCESS-ESM1-5", "CanESM5"),
@@ -73,6 +74,7 @@ htr_create_ensemble <- function(indir,
                                 season = "", # default is no season
                                 domain = "", # default is no domain
                                 mean = TRUE, # if false, use median
+                                overwrite = FALSE, # if TRUE, overwrite existing files
                                 ncores = NULL, # Use all available. Ignored on HPC
                                 hpc = NULL, # if run in the HPC, possible values are "array", "parallel"
                                 cdo_flags = "-f nc4c -z zip_1"
@@ -80,6 +82,10 @@ htr_create_ensemble <- function(indir,
 
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
+
+  # Check for files in input directory
+  all_files <- htr_list_files(indir)
+  if (is.null(all_files)) return(invisible(NULL))
 
   # Define workers
   w <- htr_workers(ncores, hpc)
@@ -129,9 +135,10 @@ htr_create_ensemble <- function(indir,
   } else {
 
     print("Please provide the right option for mean")
+    return(invisible(NULL))
 
   }
 
-  system(cdo_code)
+  htr_run_cdo(cdo_code, out_name, overwrite)
 
 }

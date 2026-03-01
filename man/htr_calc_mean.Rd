@@ -4,7 +4,7 @@
 \alias{htr_calc_mean}
 \title{Calculate temporal mean of specified time period}
 \usage{
-htr_calc_mean(indir, outdir, scenario, year_start, year_end)
+htr_calc_mean(indir, outdir, scenario, year_start, year_end, overwrite = FALSE)
 }
 \arguments{
 \item{indir}{Character string. Directory containing merged NetCDF files to be
@@ -18,6 +18,9 @@ time-sliced. Files should be continuous time series created by \code{\link[=htr_
 \item{year_start}{Numeric. Starting year for calculating the temporal mean (inclusive).}
 
 \item{year_end}{Numeric. Ending year for calculating the temporal mean (inclusive).}
+
+\item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
+successful time slicing. If \code{FALSE}, keeps original files.}
 }
 \value{
 No return value. The function creates mean files in the specified output directory

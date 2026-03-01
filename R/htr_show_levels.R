@@ -58,7 +58,8 @@ htr_show_levels <- function(indir)
 
   w <- parallel::detectCores()-2 # get number of workers
 
-  f <- dir(indir, full.names = TRUE)
+  f <- htr_list_files(indir)
+  if (is.null(f)) return(invisible(NULL))
 
   ######
 

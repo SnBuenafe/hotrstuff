@@ -5,28 +5,20 @@
 \title{Extract specific time periods from climate model data}
 \usage{
 htr_slice_period(
-  hpc = NA,
-  file = NA,
   indir,
   outdir,
   freq,
   scenario,
   year_start,
   year_end,
-  overwrite = TRUE
+  overwrite = TRUE,
+  ncores = NULL,
+  hpc = NULL,
+  file = NULL,
+  cdo_flags = "-f nc4c -z zip_1"
 )
 }
 \arguments{
-\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
-\itemize{
-\item \code{NA}: Standard processing mode
-\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
-\item \code{"parallel"}: HPC parallel mode
-}}
-
-\item{file}{Character string or NA. Specific file to process when \code{hpc = "array"}.
-Not used in other modes.}
-
 \item{indir}{Character string. Directory containing merged NetCDF files to be
 time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
@@ -45,6 +37,22 @@ match multiple scenarios (e.g., "ssp" for all SSP scenarios).}
 
 \item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
 successful time slicing. If \code{FALSE}, keeps original files.}
+
+\item{ncores}{Integer or NULL. Number of CPU cores to use for parallel processing.
+If \code{NULL} (default), uses all available cores minus 2. Ignored when \code{hpc = "array"}.}
+
+\item{hpc}{Character string or NULL. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NULL}: Standard processing mode (default)
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
+
+\item{file}{Character string or NULL. Specific file to process when \code{hpc = "array"}.
+Not used in other modes.}
+
+\item{cdo_flags}{Character string. CDO output format flags for compression.
+Default is \code{"-f nc4c -z zip_1"} for compressed NetCDF4 output.}
 }
 \value{
 No return value. The function creates time-sliced files in the specified output
@@ -91,7 +99,6 @@ making the function efficient for large datasets.
 \dontrun{
 # Extract 21st century projection period
 htr_slice_period(
-  hpc = NA,
   indir = file.path(base_dir, "data", "proc", "merged", "tos"),
   outdir = file.path(base_dir, "data", "proc", "sliced", "tos"),
   freq = "Omon", # ocean monthly
@@ -103,7 +110,6 @@ htr_slice_period(
 
 # Extract historical baseline period
 htr_slice_period(
-  hpc = NA,
   indir = file.path(base_dir, "data", "proc", "merged", "tos"),
   outdir = file.path(base_dir, "data", "proc", "sliced", "tos"),
   freq = "Omon",

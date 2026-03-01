@@ -30,6 +30,8 @@
 #' @param adjust_value Numeric. Number of years to add to the time coordinates.
 #'   Can be positive or negative. For example, use 1653 to shift model years
 #'   347-1006 to calendar years 2000-2659.
+#' @param overwrite Logical. If `FALSE` (default), skips files that already exist
+#'   in the output directory. If `TRUE`, regenerates files even if they exist.
 #'
 #' @return
 #' No return value. The function creates time-adjusted files in the specified output
@@ -68,7 +70,8 @@
 #' }
 htr_shift_years <- function(indir,
                             outdir,
-                            adjust_value
+                            adjust_value,
+                            overwrite = FALSE # if TRUE, overwrite existing files
 ) {
 
   # Create output folder if it doesn't exist
@@ -76,11 +79,12 @@ htr_shift_years <- function(indir,
 
   w <- parallel::detectCores()-2 # get number of workers
 
-  f <- dir(indir, full.names = TRUE)
+  f <- htr_list_files(indir)
+  if (is.null(f)) return(invisible(NULL))
 
   ######
 
-  do_shift <- function(f) {
+  do_shift <- function(f, overwrite) {
 
     meta <- htr_get_CMIP6_bits(f) # get the metadata
 
@@ -112,7 +116,9 @@ htr_shift_years <- function(indir,
                          ".nc")
 
       # Shift the time using the shifttime function of cdo
-      system(paste0("cdo shifttime,", adjust_value, "years", " ", f, " ", outdir, "/", filename))
+      out_file <- paste0(outdir, "/", filename)
+      cdo_code <- paste0("cdo shifttime,", adjust_value, "years", " ", f, " ", out_file)
+      htr_run_cdo(cdo_code, out_file, overwrite)
 
     } else {
       filename <- paste(meta$Variable,
@@ -127,8 +133,13 @@ htr_shift_years <- function(indir,
                                paste0(yr_end, collapse = ""),
                                ".nc"),
                         sep = "_")
-      system(paste0("cp ", f, " ", outdir, "/", filename))
-      print(filename)
+      out_file <- paste0(outdir, "/", filename)
+      if (file.exists(out_file) && !overwrite) {
+        message("Skipped (exists): ", filename, " - Set overwrite = TRUE to regenerate")
+      } else {
+        system(paste0("cp ", f, " ", out_file))
+        message("Written: ", filename)
+      }
     }
 
     ######
@@ -136,7 +147,7 @@ htr_shift_years <- function(indir,
   }
 
   future::plan(future::multisession, workers = w) # to do the shift in parallel
-  furrr::future_walk(f, do_shift)
+  furrr::future_walk(f, do_shift, overwrite)
   future::plan(future::sequential) # revert back to sequential processing
 
 }

@@ -4,18 +4,22 @@
 \alias{htr_change_freq}
 \title{Change temporal frequency of climate data}
 \usage{
-htr_change_freq(hpc = NA, file = NA, freq, indir, outdir)
+htr_change_freq(
+  indir,
+  outdir,
+  freq,
+  overwrite = FALSE,
+  ncores = NULL,
+  hpc = NULL,
+  file = NULL,
+  cdo_flags = "-f nc4c -z zip_1"
+)
 }
 \arguments{
-\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
-\itemize{
-\item \code{NA}: Standard processing mode
-\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
-\item \code{"parallel"}: HPC parallel mode
-}}
+\item{indir}{Character string. Directory containing merged NetCDF files to be
+time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
-\item{file}{Character string or NA. Specific file to process when \code{hpc = "array"}.
-Not used in other modes.}
+\item{outdir}{Character string. Directory where time-sliced files will be saved.}
 
 \item{freq}{Character string. The target temporal frequency. Valid options are:
 \itemize{
@@ -23,10 +27,24 @@ Not used in other modes.}
 \item \code{"monthly"}: Calculate monthly means using CDO monmean
 }}
 
-\item{indir}{Character string. Directory containing merged NetCDF files to be
-time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
+\item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
+successful time slicing. If \code{FALSE}, keeps original files.}
 
-\item{outdir}{Character string. Directory where time-sliced files will be saved.}
+\item{ncores}{Integer or NULL. Number of CPU cores to use for parallel processing.
+If \code{NULL} (default), uses all available cores minus 2. Ignored when \code{hpc = "array"}.}
+
+\item{hpc}{Character string or NULL. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NULL}: Standard processing mode (default)
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
+
+\item{file}{Character string or NULL. Specific file to process when \code{hpc = "array"}.
+Not used in other modes.}
+
+\item{cdo_flags}{Character string. CDO output format flags for compression.
+Default is \code{"-f nc4c -z zip_1"} for compressed NetCDF4 output.}
 }
 \value{
 No return value. The function creates frequency-converted files in the specified
@@ -48,7 +66,7 @@ The function uses CDO temporal aggregation operators to change frequency:
 The function can operate in different modes:
 \itemize{
 \item \strong{Array mode} (\code{hpc = "array"}): Processes a single specified file (useful for HPC job arrays)
-\item \strong{Parallel mode} (\code{hpc = "parallel"} or \code{hpc = NA}): Processes all files in the input directory using parallel workers
+\item \strong{Parallel mode} (\code{hpc = "parallel"} or \code{hpc = NULL}): Processes all files in the input directory using parallel workers
 }
 
 Output files are renamed to reflect the new temporal frequency, replacing "\emph{merged}"
@@ -59,18 +77,16 @@ with either "\emph{annual}" or "\emph{monthly}" in the filename.
 \item Requires CDO (Climate Data Operators) to be installed and accessible from the system PATH
 \item Input files should typically be daily frequency data for meaningful aggregation
 \item For HPC environments, set \code{hpc = "array"} and specify the \code{file} parameter
-\item Uses parallel processing when \code{hpc = NA} or \code{hpc = "parallel"}
+\item Uses parallel processing when \code{hpc = NULL} or \code{hpc = "parallel"}
 \item Worker count is automatically determined based on available CPU cores
 }
 }
 \examples{
 \dontrun{
 htr_change_freq(
-  hpc = NA,
-  file = NA,
-  freq = "monthly",
   indir = file.path(".", "data", "proc", "sliced", variable),
-  outdir = file.path(".", "data", "proc", "monthly", variable)
+  outdir = file.path(".", "data", "proc", "monthly", variable),
+  freq = "monthly"
 )
 }
 }

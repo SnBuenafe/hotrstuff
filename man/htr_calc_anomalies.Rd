@@ -4,7 +4,7 @@
 \alias{htr_calc_anomalies}
 \title{Calculate anomalies relative to the baseline mean}
 \usage{
-htr_calc_anomalies(indir, mndir, outdir)
+htr_calc_anomalies(indir, mndir, outdir, overwrite = FALSE)
 }
 \arguments{
 \item{indir}{Character string. Directory containing merged NetCDF files to be
@@ -15,6 +15,9 @@ stored. Files should follow CMIP6 naming conventions with variable, frequency,
 and model information in the filename.}
 
 \item{outdir}{Character string. Directory where time-sliced files will be saved.}
+
+\item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
+successful time slicing. If \code{FALSE}, keeps original files.}
 }
 \value{
 No return value. The function creates anomaly files in the specified output

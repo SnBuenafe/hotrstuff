@@ -21,6 +21,8 @@
 #'    - `"setmisstoc"`: Set missing values to a defined constant (requires `constant` parameter)
 #' @param neighbors Numeric. Number of neighbors used to calculate missing values. Default is 4.
 #' @param constant Numeric. Constant value used to replace all missing values.
+#' @param overwrite Logical. If `FALSE` (default), skips files that already exist
+#'   in the output directory. If `TRUE`, regenerates files even if they exist.
 #'
 #' @return
 #' No return value. The function creates time-sliced files in the specified output
@@ -39,40 +41,36 @@
 #' @examples
 #' \dontrun{
 #' # Fill missing values using distance-weighted average of 7 neighbors
-#' htr_fill_missing(hpc = NA,
-#'                 file = NA,
-#'                 indir = file.path(base_dir, "data", "proc", "integrated", "tos"),
-#'                 outdir = file.path(base_dir, "data", "proc", "filled", "tos"),
-#'                 method = "setmisstodis",
-#'                 neighbors = 7,
-#'                 constant = NA
+#' htr_fill_missing(
+#'   indir = file.path(base_dir, "data", "proc", "integrated", "tos"),
+#'   outdir = file.path(base_dir, "data", "proc", "filled", "tos"),
+#'   method = "setmisstodis",
+#'   neighbors = 7
 #' )
 #'
 #' # Fill missing values using the nearest neighbor's value
-#' htr_fill_missing(hpc = NA,
-#'                 file = NA,
-#'                 indir = file.path(base_dir, "data", "proc", "integrated", "tos"),
-#'                 outdir = file.path(base_dir, "data", "proc", "filled", "tos")
+#' htr_fill_missing(
+#'   indir = file.path(base_dir, "data", "proc", "integrated", "tos"),
+#'   outdir = file.path(base_dir, "data", "proc", "filled", "tos")
 #' )
 #' }
-htr_fill_missing <- function(hpc = NA,
-                             file = NA,
-                             indir,
+htr_fill_missing <- function(indir,
                              outdir,
                              method = "setmisstonn", # default is setmistonn
-                             neighbors = NA, # if method = setmisstodis, default set is 4 if no number is given
-                             constant = NA # if method = setmisstoc, this is required
+                             neighbors = NULL, # if method = setmisstodis, default set is 4 if no number is given
+                             constant = NULL, # if method = setmisstoc, this is required
+                             overwrite = FALSE, # if TRUE, overwrite existing files
+                             ncores = NULL, # Use all available. Ignored on HPC
+                             hpc = NULL, # if run in the HPC, possible values are "array", "parallel"
+                             file = NULL, # hpc = "array", the input will be the file
+                             cdo_flags = "-f nc4c -z zip_1"
 ) {
 
   # Create output folder if it doesn't exist
   htr_make_folder(outdir)
 
   # Define workers
-  if(is.na(hpc)) {
-    w <- parallelly::availableCores(methods = "system", omit = 2)
-  } else {
-    w <- parallelly::availableCores(methods = "Slurm", omit = 2)
-  }
+  w <- htr_workers(ncores, hpc)
 
   ##############
 
@@ -81,7 +79,8 @@ htr_fill_missing <- function(hpc = NA,
   fill_missing <- function(file,
                            method,
                            constant,
-                           neighbors) {
+                           neighbors,
+                           overwrite) {
 
     # Naming new file
     out_file <- file %>%
@@ -97,33 +96,34 @@ htr_fill_missing <- function(hpc = NA,
 
         if(is.numeric(constant)) {
 
-          system_code <- paste0("cdo ", method_name, ",", constant, " ", file, " ", out_file)
+          system_code <- paste0("cdo ", cdo_flags, " ", method_name, ",", constant, " ", file, " ", out_file)
 
         } else {
 
           print("Please provide a numeric constant value.")
+          return(invisible(NULL))
 
         }
 
       } else if(method_name == "setmisstonn") {
 
-        system_code <- paste0("cdo ", method_name, ",", " ", file, " ", out_file)
+        system_code <- paste0("cdo ", cdo_flags, " ", method_name, " ", file, " ", out_file)
 
       } else if(method_name == "setmisstodis") {
 
         if(is.numeric(neighbors)) {
 
-          system_code <- paste0("cdo ", method_name, ",", neighbors, " ", file, " ", out_file)
+          system_code <- paste0("cdo ", cdo_flags, " ", method_name, ",", neighbors, " ", file, " ", out_file)
 
         } else {
 
-          system_code <- paste0("cdo ", method_name, " ", file, " ", out_file)
+          system_code <- paste0("cdo ", cdo_flags, " ", method_name, " ", file, " ", out_file)
 
         }
 
       }
 
-      system(system_code)
+      htr_run_cdo(system_code, out_file, overwrite)
 
     } else {
 
@@ -138,21 +138,24 @@ htr_fill_missing <- function(hpc = NA,
 
   # TODO: Change this
 
-  if (hpc %in% c("array")) { # For hpc == "array", use the specific files as the starting point
+  if (isTRUE(hpc %in% "array")) { # For hpc == "array", use the specific files as the starting point
 
-    netCDF <- dir(indir, pattern = file, full.names = TRUE)
+    netCDF <- htr_list_files(indir, pattern = file)
+    if (is.null(netCDF)) return(invisible(NULL))
 
     fill_missing(netCDF,
                  method,
                  constant,
-                 neighbors) # run function
+                 neighbors,
+                 overwrite) # run function
 
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
 
-    netCDFs <- dir(indir, full.names = TRUE)
+    netCDFs <- htr_list_files(indir)
+    if (is.null(netCDFs)) return(invisible(NULL))
 
     future::plan(future::multisession, workers = w)
-    furrr::future_walk(netCDFs, fill_missing, method, constant, neighbors)
+    furrr::future_walk(netCDFs, fill_missing, method, constant, neighbors, overwrite)
     future::plan(future::sequential)
 
   }

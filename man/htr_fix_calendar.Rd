@@ -4,21 +4,33 @@
 \alias{htr_fix_calendar}
 \title{Fix calendar systems by standardizing to 365-day calendar}
 \usage{
-htr_fix_calendar(hpc = NA, file = NA, indir)
+htr_fix_calendar(
+  indir,
+  ncores = NULL,
+  hpc = NULL,
+  file = NULL,
+  cdo_flags = "-f nc4c -z zip_1"
+)
 }
 \arguments{
-\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
+\item{indir}{Character string. Directory containing NetCDF files that need calendar
+standardization. Files should be climate model outputs with time dimensions.}
+
+\item{ncores}{Integer or NULL. Number of CPU cores to use for parallel processing.
+If \code{NULL} (default), uses all available cores minus 2. Ignored when \code{hpc = "array"}.}
+
+\item{hpc}{Character string or NULL. Indicates High Performance Computing mode:
 \itemize{
-\item \code{NA}: Standard processing mode
+\item \code{NULL}: Standard processing mode (default)
 \item \code{"array"}: HPC array job mode (requires \code{file} parameter)
 \item \code{"parallel"}: HPC parallel mode
 }}
 
-\item{file}{Character string or NA. Specific file to process when \code{hpc = "array"}.
+\item{file}{Character string or NULL. Specific file to process when \code{hpc = "array"}.
 Not used in other modes.}
 
-\item{indir}{Character string. Directory containing NetCDF files that need calendar
-standardization. Files should be climate model outputs with time dimensions.}
+\item{cdo_flags}{Character string. CDO output format flags for compression.
+Default is \code{"-f nc4c -z zip_1"} for compressed NetCDF4 output.}
 }
 \value{
 No return value. The function modifies files in-place, replacing original files
@@ -59,8 +71,6 @@ The process creates temporary files during processing to avoid data corruption.
 \examples{
 \dontrun{
 htr_fix_calendar(
-  hpc = NA,
-  file = NA,
   indir = file.path(base_dir, "data", "merged") # input directory
 )
 }

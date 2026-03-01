@@ -4,19 +4,19 @@
 \alias{htr_regrid_esm}
 \title{Regrid Earth System Model outputs to a common spatial grid}
 \usage{
-htr_regrid_esm(hpc = NA, file = NA, indir, outdir, cell_res = 0.25, layer)
+htr_regrid_esm(
+  indir,
+  outdir,
+  cell_res = 0.25,
+  layer,
+  overwrite = FALSE,
+  ncores = NULL,
+  hpc = NULL,
+  file = NULL,
+  cdo_flags = "-f nc4c -z zip_1"
+)
 }
 \arguments{
-\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
-\itemize{
-\item \code{NA}: Standard processing mode
-\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
-\item \code{"parallel"}: HPC parallel mode
-}}
-
-\item{file}{Character string or NA. Specific file to process when \code{hpc = "array"}.
-Not used in other modes.}
-
 \item{indir}{Character string. Directory containing merged NetCDF files to be
 time-sliced. Files should be continuous time series created by \code{\link[=htr_merge_files]{htr_merge_files()}}.}
 
@@ -29,6 +29,25 @@ Default is 0.25 degrees.}
 \item{layer}{Character string. Description of the data layer being regridded
 (e.g., "annual", "monthly", "anomalies"). This is used for filename generation
 and progress reporting.}
+
+\item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
+successful time slicing. If \code{FALSE}, keeps original files.}
+
+\item{ncores}{Integer or NULL. Number of CPU cores to use for parallel processing.
+If \code{NULL} (default), uses all available cores minus 2. Ignored when \code{hpc = "array"}.}
+
+\item{hpc}{Character string or NULL. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NULL}: Standard processing mode (default)
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
+
+\item{file}{Character string or NULL. Specific file to process when \code{hpc = "array"}.
+Not used in other modes.}
+
+\item{cdo_flags}{Character string. CDO output format flags for compression.
+Default is \code{"-f nc4c -z zip_1"} for compressed NetCDF4 output.}
 }
 \value{
 No return value. The function creates regridded files in the specified output
@@ -77,8 +96,6 @@ The \code{-s} flag suppresses CDO messages, and \code{-L} enables netCDF4 compre
 \examples{
 \dontrun{
 htr_regrid_esm(
-  hpc = NA,
-  file = NA,
   indir = file.path(base_dir, "data", "proc", "yearly", "tos"),
   outdir = file.path(base_dir, "data", "proc", "regridded", "yearly", "tos"),
   cell_res = 0.25,

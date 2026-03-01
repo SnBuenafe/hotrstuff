@@ -5,23 +5,17 @@
 \title{Download Earth System Model (ESM) data using wget scripts}
 \usage{
 htr_download_ESM(
-  hpc = NA,
   indir,
   outdir,
   quiet = TRUE,
   security = FALSE,
-  openid = NA,
-  certificate = NA
+  openid = NULL,
+  certificate = NULL,
+  ncores = NULL,
+  hpc = NULL
 )
 }
 \arguments{
-\item{hpc}{Character string or NA. Indicates High Performance Computing mode:
-\itemize{
-\item \code{NA}: Standard processing mode
-\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
-\item \code{"parallel"}: HPC parallel mode
-}}
-
 \item{indir}{Character string. Directory containing wget script files. These are
 typically bash scripts with wget commands for downloading climate data from
 remote repositories (e.g., ESGF data nodes).}
@@ -42,6 +36,16 @@ to download secure files.}
 
 \item{certificate}{Character string. String of the certificate that can be used
 to download secure files.}
+
+\item{ncores}{Integer or NULL. Number of CPU cores to use for parallel processing.
+If \code{NULL} (default), uses all available cores minus 2. Ignored when \code{hpc = "array"}.}
+
+\item{hpc}{Character string or NULL. Indicates High Performance Computing mode:
+\itemize{
+\item \code{NULL}: Standard processing mode (default)
+\item \code{"array"}: HPC array job mode (requires \code{file} parameter)
+\item \code{"parallel"}: HPC parallel mode
+}}
 }
 \value{
 No return value. The function downloads NetCDF files to the specified output
@@ -81,7 +85,6 @@ downloading of large datasets.
 \examples{
 \dontrun{
 htr_download_ESM(
-  hpc = NA,
   indir = file.path(base_dir, "data", "raw", "wget"), # input directory
   outdir = file.path(base_dir, "data", "raw", "tos") # output directory
 )
