@@ -27,7 +27,6 @@ Description: What the package does (one paragraph).
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Suggests: 
     here,
     knitr,
@@ -48,3 +47,4 @@ Imports:
     terra
 URL: https://github.com/SnBuenafe/hotrstuff
 BugReports: https://github.com/SnBuenafe/hotrstuff/issues
+Config/roxygen2/version: 8.1.0
