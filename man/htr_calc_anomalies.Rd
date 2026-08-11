@@ -16,8 +16,8 @@ and model information in the filename.}
 
 \item{outdir}{Character string. Directory where time-sliced files will be saved.}
 
-\item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
-successful time slicing. If \code{FALSE}, keeps original files.}
+\item{overwrite}{Logical. If \code{FALSE} (default), skips files that already exist
+in the output directory. If \code{TRUE}, regenerates files even if they exist.}
 }
 \value{
 No return value. The function creates anomaly files in the specified output

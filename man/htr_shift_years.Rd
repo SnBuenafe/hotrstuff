@@ -15,6 +15,9 @@ time coordinates that may need shifting.}
 \item{adjust_value}{Numeric. Number of years to add to the time coordinates.
 Can be positive or negative. For example, use 1653 to shift model years
 347-1006 to calendar years 2000-2659.}
+
+\item{overwrite}{Logical. If \code{FALSE} (default), skips files that already exist
+in the output directory. If \code{TRUE}, regenerates files even if they exist.}
 }
 \value{
 No return value. The function creates time-adjusted files in the specified output

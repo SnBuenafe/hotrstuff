@@ -27,8 +27,8 @@ time-sliced. Files should be continuous time series created by \code{\link[=htr_
 \item \code{"monthly"}: Calculate monthly means using CDO monmean
 }}
 
-\item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
-successful time slicing. If \code{FALSE}, keeps original files.}
+\item{overwrite}{Logical. If \code{FALSE} (default), skips files that already exist
+in the output directory. If \code{TRUE}, regenerates files even if they exist.}
 
 \item{ncores}{Integer or NULL. Number of CPU cores to use for parallel processing.
 If \code{NULL} (default), uses all available cores minus 2. Ignored when \code{hpc = "array"}.}

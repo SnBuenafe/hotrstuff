@@ -27,8 +27,8 @@ ending before this year (for historical data) will be excluded.}
 \item{year_end}{Numeric. Latest year to include in the merged files. Files
 starting after this year (for projection data) will be excluded.}
 
-\item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
-successful time slicing. If \code{FALSE}, keeps original files.}
+\item{overwrite}{Logical. If \code{FALSE} (default), skips files that already exist
+in the output directory. If \code{TRUE}, regenerates files even if they exist.}
 
 \item{ncores}{Integer or NULL. Number of CPU cores to use for parallel processing.
 If \code{NULL} (default), uses all available cores minus 2. Ignored when \code{hpc = "array"}.}

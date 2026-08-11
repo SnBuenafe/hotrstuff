@@ -19,8 +19,8 @@ time-sliced. Files should be continuous time series created by \code{\link[=htr_
 
 \item{year_end}{Numeric. Ending year for calculating the temporal mean (inclusive).}
 
-\item{overwrite}{Logical. If \code{TRUE} (default), removes original files after
-successful time slicing. If \code{FALSE}, keeps original files.}
+\item{overwrite}{Logical. If \code{FALSE} (default), skips files that already exist
+in the output directory. If \code{TRUE}, regenerates files even if they exist.}
 }
 \value{
 No return value. The function creates mean files in the specified output directory
