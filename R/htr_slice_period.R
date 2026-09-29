@@ -88,7 +88,7 @@
 #'   scenario = "historical",
 #'   year_start = 1995,
 #'   year_end = 2014,
-#'   overwrite = TRUE
+#'   overwrite = FALSE
 #' )
 #' }
 htr_slice_period <- function(indir, # where the merged files are
@@ -97,7 +97,7 @@ htr_slice_period <- function(indir, # where the merged files are
                              scenario, # historical or ssp
                              year_start,
                              year_end,
-                             overwrite = TRUE, # TRUE or FALSE
+                             overwrite = FALSE, # TRUE or FALSE
                              ncores = NULL, # Use all available. Ignored on HPC
                              hpc = NULL, # if run in the HPC, possible values are "array", "parallel"
                              file = NULL, # hpc = "array", the input will be the file
