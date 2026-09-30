@@ -185,7 +185,7 @@ trim_period <- function(f, # file
     htr_get_Years(f, year_start, year_end, indir, outdir, overwrite, cdo_flags) # replacing files in merged folder with trimmed files
 
     if (isTRUE(overwrite)) {
-      terminal_code <- paste0("rm ", indir, "/", f)
+      terminal_code <- paste0("rm ", outdir, "/", f)
       system(terminal_code)
     }
   }
