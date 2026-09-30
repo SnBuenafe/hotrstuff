@@ -121,20 +121,28 @@ htr_merge_files <- function(indir, # where nc files are located
     }
 
     if (length(files) > 0) { # Only if there are files to process
-      y1 <- htr_get_CMIP6_bits(files[1])$Year_start %>%
-        as.character() %>%
-        stringr::str_replace_all("-", "")
+      # y1 <- htr_get_CMIP6_bits(files[1])$Year_start %>%
+      #   as.character() %>%
+      #   stringr::str_replace_all("-", "")
 
-      y2 <- htr_get_CMIP6_bits(files[length(files)])$Year_end %>%
-        as.character() %>%
-        stringr::str_replace_all("-", "")
+      # y2 <- htr_get_CMIP6_bits(files[length(files)])$Year_end %>%
+      #   as.character() %>%
+      #   stringr::str_replace_all("-", "")
+
+      # out_file <- paste0(
+      #   outdir, "/", v, "_", fr, "_", m, "_", s,
+      #   "_", vt, "_merged_", y1, "-", y2, ".nc"
+      # )
 
       out_file <- paste0(
         outdir, "/", v, "_", fr, "_", m, "_", s,
-        "_", vt, "_merged_", y1, "-", y2, ".nc"
+        "_", vt, "_merged_", year_start, "0101-", year_end, "1231.nc"
       )
 
-      cdo_code <- paste0("cdo ", cdo_flags, " -L -selname,", "'", v, "' -mergetime ", paste0(files, collapse = " "), " ", out_file)
+      cdo_code <- paste0("cdo ", cdo_flags, " -L -seldate,", year_start, "-01-01,", year_end, "-12-31 -selname,", v, " -mergetime ", paste0(files, collapse = " "), " ", out_file)
+
+      # cdo seldate,2020-01-01,2020-12-31 -mergetime i
+
       htr_run_cdo(cdo_code, out_file, overwrite)
     }
   }
