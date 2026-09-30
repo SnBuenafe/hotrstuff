@@ -144,7 +144,7 @@ htr_slice_period <- function(indir, # where the merged files are
 
   } else { # For hpc == "parallel" and non-hpc work, use the input directory as the starting point and run jobs in parallel
 
-    files <- htr_list_files(indir, pattern = paste0("_", freq, "_"))
+    files <- htr_list_files(indir, pattern = paste0("_", freq, "_"), full.names = FALSE)
     if (is.null(files)) return(invisible(NULL))
     files <- files[stringr::str_detect(files, scenario)]
 
